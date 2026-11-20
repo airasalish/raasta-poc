@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<title>Raasta POC</title>
+<style>
+  :root {
+    --bg: #eef2f1; --card: #ffffff; --ink: #11201d; --muted: #5b6b67; --line: #d9e1df;
+    --brand: #0f766e; --brand-soft: #d6efec; --good: #15803d; --good-soft: #dcfce7;
+    --warn: #b45309; --warn-soft: #fef3c7; --bad: #b91c1c; --bad-soft: #fee2e2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b1211; --card: #131d1b; --ink: #e6efed; --muted: #94a8a3; --line: #24332f;
+      --brand: #2dd4bf; --brand-soft: #123532; --good: #4ade80; --good-soft: #12301d;
+      --warn: #fbbf24; --warn-soft: #36290b; --bad: #f87171; --bad-soft: #3a1414; }
+  }
+  :root[data-theme="dark"] { --bg: #0b1211; --card: #131d1b; --ink: #e6efed; --muted: #94a8a3; --line: #24332f;
+    --brand: #2dd4bf; --brand-soft: #123532; --good: #4ade80; --good-soft: #12301d;
+    --warn: #fbbf24; --warn-soft: #36290b; --bad: #f87171; --bad-soft: #3a1414; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, "Noto Sans Tamil", sans-serif; }
+  .phone { max-width: 420px; min-height: 100vh; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--brand); color: #fff; position: sticky; top: 0; z-index: 2; }
+  header b { font-size: 20px; letter-spacing: .3px; }
+  .net { font-size: 12px; padding: 3px 8px; border-radius: 99px; background: rgba(255,255,255,.2); }
+  main { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  nav { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--card); border-top: 1px solid var(--line); }
+  nav button { border: 0; background: none; color: var(--muted); padding: 8px 2px 10px; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+  nav button span { font-size: 22px; }
+  nav button.on { color: var(--brand); font-weight: 600; }
+  nav button:disabled { opacity: .35; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  h2 { margin: 4px 0; font-size: 20px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .btn { border: 0; border-radius: 12px; padding: 14px 16px; font-size: 17px; font-weight: 600; cursor: pointer; background: var(--brand); color: #fff; width: 100%; }
+  .btn.ghost { background: var(--brand-soft); color: var(--brand); }
+  .row { display: flex; gap: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .opt { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 10px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; }
+  .opt span { font-size: 28px; }
+  .opt:hover { border-color: var(--brand); }
+  .bubble { max-width: 85%; padding: 10px 12px; border-radius: 14px; }
+  .bot { background: var(--card); border: 1px solid var(--line); align-self: flex-start; }
+  .me { background: var(--brand); color: #fff; align-self: flex-end; }
+  .chat { display: flex; flex-direction: column; gap: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--brand-soft); color: var(--brand); padding: 4px 10px; border-radius: 99px; font-size: 13px; }
+  .mic { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--brand); color: #fff; font-size: 28px; cursor: pointer; flex: none; }
+  .mic.live { background: var(--bad); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { transform: scale(1.08); } }
+  input[type=text] { flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 16px; background: var(--card); color: var(--ink); }
+  .tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; padding: 2px 8px; border-radius: 99px; background: var(--brand-soft); color: var(--brand); }
+  .status { font-weight: 700; padding: 3px 10px; border-radius: 99px; font-size: 13px; }
+  .eligible { background: var(--good-soft); color: var(--good); }
+  .not_eligible { background: var(--bad-soft); color: var(--bad); }
+  .maybe { background: var(--warn-soft); color: var(--warn); }
+  ul.reasons { list-style: none; padding: 0; margin: 8px 0; font-size: 14px; }
+  ul.reasons li { padding: 2px 0; }
+  .verify { font-size: 11px; color: var(--warn); }
+  a { color: var(--brand); }
+  .week { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .week b { color: var(--brand); min-width: 56px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+  .flag { color: var(--warn); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <header><b>🧭 Raasta</b><span class="net" id="net">online</span></header>
+  <main id="view"></main>
+  <nav id="nav">
+    <button data-v="talk"><span>🎙️</span>Talk</button>
+    <button data-v="careers"><span>🧭</span>Careers</button>
+    <button data-v="radar"><span>🎯</span>Radar</button>
+    <button data-v="pathway"><span>🗺️</span>Pathway</button>
+    <button data-v="facilitator"><span>👩‍🏫</span>Teacher</button>
+  </nav>
+</div>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
