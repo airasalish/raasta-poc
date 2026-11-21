@@ -1,8 +1,11 @@
-// Raasta UI/UX Engine (Kaveri Dawn Design System)
-// Designed for rural students, low literacy, offline resilience, and Tamil-first interaction.
+// ============================================================================
+// RAASTA APPLICATION CORE (Kaveri Dawn Design System)
+// Complete Redesign for Citi India Hackathon (Ada Lovelace Day)
+// Lead Designer & Frontend Engineer: Aira K Salish
+// ============================================================================
 
 const S = {
-  lang: null,
+  lang: "ta", // Tamil-first default
   profile: { state: "TN", disability: false },
   step: 0,
   msgs: [],
@@ -12,6 +15,7 @@ const S = {
   })(),
   view: "start",
   isListening: false,
+  isPlayingAudio: false,
   facilitatorFilter: "all"
 };
 
@@ -19,9 +23,9 @@ const $ = sel => document.querySelector(sel);
 const L = (o, k = "") => (S.lang === "ta" ? (o.ta ?? o[k + "ta"] ?? o.en) : (o.en ?? o[k + "en"]));
 const esc = s => String(s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// ==========================================
-// 1. VOICE ABSTRACTION (Akshaj interface ready)
-// ==========================================
+// ============================================================================
+// 1. VOICE ABSTRACTION (Akshaj interface ready, Web Speech fallback)
+// ============================================================================
 const Voice = {
   speak(text, lang = S.lang) {
     if (window.RaastaVoice && typeof window.RaastaVoice.speak === "function") {
@@ -31,15 +35,23 @@ const Voice = {
     return new Promise(resolve => {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang === "ta" ? "ta-IN" : "en-IN";
+      u.lang = lang === "ta" ? "ta-IN" : (lang === "hi" ? "hi-IN" : (lang === "ml" ? "ml-IN" : "en-IN"));
       const voices = speechSynthesis.getVoices();
-      const v = voices.find(v => v.lang === u.lang || v.lang.startsWith(lang));
+      const v = voices.find(voice => voice.lang === u.lang || voice.lang.startsWith(lang));
       if (v) u.voice = v;
       u.rate = 0.92;
-      u.onend = resolve;
-      u.onerror = resolve;
+      u.onend = () => { S.isPlayingAudio = false; updateAudioUI(); resolve(); };
+      u.onerror = () => { S.isPlayingAudio = false; updateAudioUI(); resolve(); };
+      S.isPlayingAudio = true;
+      updateAudioUI();
       speechSynthesis.speak(u);
     });
+  },
+
+  stopSpeak() {
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    S.isPlayingAudio = false;
+    updateAudioUI();
   },
 
   listen(onText, lang = S.lang) {
@@ -48,46 +60,56 @@ const Voice = {
     }
     const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Rec) {
-      alert(S.lang === "ta" ? "குரல் வழி பதிவு செய்ய Chrome உலாவியைப் பயன்படுத்தவும்." : "Voice input works best in Google Chrome. Tap an icon below or type.");
+      alert(S.lang === "ta" ? "குரல் பதிவு செய்ய Chrome உலாவியைப் பயன்படுத்தவும்." : "Voice input works best in Google Chrome. Tap an option or type below.");
       return;
     }
     const r = new Rec();
-    r.lang = lang === "ta" ? "ta-IN" : "en-IN";
+    r.lang = lang === "ta" ? "ta-IN" : (lang === "hi" ? "hi-IN" : (lang === "ml" ? "ml-IN" : "en-IN"));
     r.interimResults = false;
     
-    const mic = $("#mic");
-    const micStatus = $("#micStatus");
-    if (mic) mic.classList.add("listening");
-    if (micStatus) micStatus.textContent = S.lang === "ta" ? "கேட்கிறது... பேசுங்கள்" : "Listening... speak now";
-    S.isListening = true;
+    setMicState(true);
 
     r.onresult = e => {
       const text = e.results[0][0].transcript;
+      setMicState(false);
       onText(text);
     };
-    r.onend = () => {
-      if (mic) mic.classList.remove("listening");
-      if (micStatus) micStatus.textContent = S.lang === "ta" ? "பேச தட்டவும்" : "Tap to speak";
-      S.isListening = false;
-    };
-    r.onerror = () => {
-      if (mic) mic.classList.remove("listening");
-      if (micStatus) micStatus.textContent = S.lang === "ta" ? "பேச தட்டவும்" : "Tap to speak";
-      S.isListening = false;
-    };
-    try { r.start(); } catch (e) { console.error(e); }
+    r.onend = () => setMicState(false);
+    r.onerror = () => setMicState(false);
+    try { r.start(); } catch (err) { setMicState(false); }
   }
 };
 
-// ==========================================
+function setMicState(listening) {
+  S.isListening = listening;
+  const orb = $("#micOrb");
+  const status = $("#micStatusText");
+  if (orb) orb.classList.toggle("recording", listening);
+  if (status) {
+    status.textContent = listening 
+      ? (S.lang === "ta" ? "கேட்கிறது... பேசுங்கள்" : "Listening... speak now")
+      : (S.lang === "ta" ? "பேச மைக் தொடவும்" : "Tap mic to speak");
+  }
+}
+
+function updateAudioUI() {
+  const playBtn = $("#parentPlayBtn");
+  if (playBtn) {
+    playBtn.innerHTML = S.isPlayingAudio
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> ${S.lang === "ta" ? "நிறுத்து (Stop)" : "Stop Audio"}`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ${S.lang === "ta" ? "பெற்றோருக்கு ஒலிக்கவும் (Play for Family)" : "Play for Family"}`;
+  }
+}
+
+// ============================================================================
 // 2. CONVERSATIONAL PROFILING (Talk, Don't Type)
-// ==========================================
+// ============================================================================
 function askQuestion() {
   const q = QUESTIONS[S.step];
   if (!q) {
     const doneText = S.lang === "ta" 
-      ? "அருமை! உங்கள் திறன்கள் பதிவு செய்யப்பட்டன. உங்களுக்கான வழிகள் தயாராக உள்ளன." 
-      : "Excellent! Your Skill Genome is complete. Your career routes are ready.";
+      ? "அருமை! உங்கள் திறன்கள் அனைத்தும் வெற்றிகரமாகப் பதிவு செய்யப்பட்டன. உங்களுக்கான வழிகளைப் பார்க்கவும்." 
+      : "Excellent! Your Skill Genome is complete. Let's explore your tailored career routes.";
     S.msgs.push({ who: "bot", text: doneText });
     Voice.speak(doneText);
     render();
@@ -118,51 +140,62 @@ function processSpeechInput(text) {
     answerQuestion(matched, text);
   } else {
     S.msgs.push({ who: "me", text });
-    const retryText = S.lang === "ta" ? "புரியவில்லை, கீழே உள்ளவற்றில் ஒன்றைத் தொடவும்." : "I didn't quite catch that. Please tap an option below.";
+    const retryText = S.lang === "ta" 
+      ? "புரியவில்லை, கீழே உள்ளவற்றில் பொருத்தமான ஒன்றைத் தொடவும்." 
+      : "I couldn't quite catch that. Please tap an option below.";
     S.msgs.push({ who: "bot", text: retryText });
     Voice.speak(retryText);
     render();
   }
 }
 
-// Presenter 1-tap fail-safe shortcut
+// Fail-safe one-tap presenter demo shortcut
 function fillKavya() {
   S.profile = { ...KAVYA };
   S.msgs = [
     { who: "me", text: "நான் அக்கம்பக்கத்தினருக்கு துணி தைத்துக் கொடுப்பேன் (I stitch clothes for my neighbours)" },
-    { who: "bot", text: S.lang === "ta" ? "அருமை! உங்கள் சுயவிவரம் தயாராக உள்ளது." : "Splendid! Your profile is ready." }
+    { who: "bot", text: S.lang === "ta" ? "அருமை! காவ்யா அவர்களின் சுயவிவரம் தயாராக உள்ளது." : "Splendid! Kavya's Skill Genome is ready." }
   ];
   S.step = QUESTIONS.length;
   render();
 }
 
-// ==========================================
-// 3. UI RENDERING & VIEWS
-// ==========================================
-const chipLabels = () => QUESTIONS.filter(q => S.profile[q.key] !== undefined).map(q => {
-  const v = S.profile[q.key];
-  const o = q.options.find(opt => (Array.isArray(v) ? v.includes(opt.v) : opt.v === v));
-  return o ? { key: q.key, label: `${o.icon} ${L(o)}`, raw: o } : null;
-}).filter(Boolean);
+// ============================================================================
+// 3. UI RENDERING & DATA ADAPTERS
+// ============================================================================
+const isProfileComplete = () => S.step >= QUESTIONS.length;
 
-const renderGenomeChips = () => {
-  const items = chipLabels();
-  if (!items.length) return "";
+const getCollectedChips = () => {
+  return QUESTIONS.filter(q => S.profile[q.key] !== undefined).map(q => {
+    const v = S.profile[q.key];
+    const o = q.options.find(opt => (Array.isArray(v) ? v.includes(opt.v) : opt.v === v));
+    return o ? { key: q.key, label: `${o.icon} ${L(o)}`, raw: o } : null;
+  }).filter(Boolean);
+};
+
+const renderGenomeDrawer = () => {
+  const chips = getCollectedChips();
+  if (!chips.length) return "";
   return `
-    <div class="genome-container">
-      <div class="genome-header">
-        <span>🧬 ${S.lang === "ta" ? "உங்கள் திறன் வரைபடம் (Skill Genome)" : "Skill Genome"}</span>
-        <button class="btn sm ghost" data-act="go" data-v="profile" style="padding: 2px 8px; font-size:11px; width:auto;">
-          ✏️ ${S.lang === "ta" ? "விவரம் / Edit" : "Edit"}
+    <div class="genome-card" style="margin-bottom:4px;">
+      <div class="row-between" style="margin-bottom:8px;">
+        <div style="font-size:12.5px; font-weight:700; color:var(--brand-primary); display:flex; align-items:center; gap:6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          ${S.lang === "ta" ? "சேகரிக்கப்பட்ட திறன் வரைபடம் (Skill Genome)" : "Live Skill Genome"}
+        </div>
+        <button class="ui-button btn-ghost btn-sm" data-act="go" data-v="profile" style="padding:2px 8px; font-size:11px;">
+          ${S.lang === "ta" ? "விவரம் / Edit" : "Inspect"}
         </button>
       </div>
-      <div class="chips">
-        ${items.map(item => `<span class="chip" data-act="go" data-v="profile" style="cursor:pointer;" title="Tap to view profile">${esc(item.label)}</span>`).join("")}
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        ${chips.map(c => `
+          <span style="background:var(--brand-surface); color:var(--brand-primary); border:1px solid var(--brand-border); padding:3px 10px; border-radius:var(--radius-full); font-size:12px; font-weight:700;">
+            ${esc(c.label)}
+          </span>
+        `).join("")}
       </div>
     </div>`;
 };
-
-const isProfileComplete = () => S.step >= QUESTIONS.length;
 
 function parentScriptText() {
   const c = CAREERS.find(c => c.id === S.careerId) || matchCareers(S.profile)[0] || CAREERS[0];
@@ -171,142 +204,228 @@ function parentScriptText() {
   const careerTitle = L(c.title);
   
   return S.lang === "ta"
-    ? `வணக்கம். ${name} ${careerTitle} துறையில் படிக்க விரும்புகிறார். இதற்கு அரசு மற்றும் தனியார் மூலம் ${eligibleCount} உதவித்தொகைகள் கிடைக்க வாய்ப்பு உள்ளது. எதிர்பார்க்கப்படும் ஆரம்ப வருமானம் ${c.earn}. இந்த படிப்பு பாதுகாப்பானது மற்றும் ஆசிரியர் வழிகாட்டலில் விண்ணப்பிக்கலாம்.`
-    : `Hello. ${name} aspires to pursue ${careerTitle}. Up to ${eligibleCount} verified scholarships are available to support this education. Expected earnings: ${c.earn}. This pathway is recognized, safe, and the school facilitator will assist with applications.`;
+    ? `வணக்கம். ${name} ${careerTitle} துறையில் படிக்க விரும்புகிறார். இதற்கு அரசு மற்றும் அங்கீகரிக்கப்பட்ட மூலம் ${eligibleCount} உதவித்தொகைகள் கிடைக்க வாய்ப்பு உள்ளது. எதிர்பார்க்கப்படும் ஆரம்ப வருமானம் ${c.earn}. இந்த படிப்பு பாதுகாப்பானது மற்றும் பள்ளி ஆசிரியர் வழிகாட்டலில் விண்ணப்பிக்கலாம்.`
+    : `Hello. ${name} aspires to pursue ${careerTitle}. Up to ${eligibleCount} verified government and merit scholarships are available to support this education. Expected starting earnings: ${c.earn}. This pathway is recognized, safe, and the school facilitator will assist with all applications.`;
 }
 
+// ============================================================================
+// 4. SCREEN VIEWS (8 POLISHED SCREENS)
+// ============================================================================
 const views = {
-  // --- 1. Welcome & Language Picker ---
+  // --------------------------------------------------------------------------
+  // SCREEN A: WELCOME & LANGUAGE PICK
+  // --------------------------------------------------------------------------
   start: () => `
-    <div class="card" style="text-align:center; padding: 26px 16px;">
-      <div style="font-size: 56px; margin-bottom: 8px;">🧭</div>
-      <h1>Raasta · ராஸ்தா</h1>
-      <p class="muted" style="font-size: 15px; margin: 8px 0 16px;">
-        Google Maps for Careers · கிராமப்புற மாணவர்களுக்கான வழிகாட்டி
+    <div class="welcome-hero">
+      <!-- Custom SVG Path & Sunrise Illustration -->
+      <svg class="hero-illustration" viewBox="0 0 320 140" fill="none">
+        <defs>
+          <linearGradient id="sunGrad" x1="160" y1="20" x2="160" y2="90" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#F59E0B" />
+            <stop offset="1" stop-color="#D97706" />
+          </linearGradient>
+          <linearGradient id="roadGrad" x1="160" y1="60" x2="160" y2="140" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#0A5C44" />
+            <stop offset="1" stop-color="#063829" />
+          </linearGradient>
+        </defs>
+        <circle cx="160" cy="65" r="42" fill="url(#sunGrad)" opacity="0.9" />
+        <path d="M0 110 Q80 85 160 85 T320 110 L320 140 L0 140 Z" fill="#E8F5F1" />
+        <path d="M125 140 L152 75 L168 75 L195 140 Z" fill="url(#roadGrad)" />
+        <path d="M160 80 L160 92 M160 102 L160 118 M160 128 L160 140" stroke="#FDE68A" stroke-width="2.5" stroke-dasharray="2 3" />
+      </svg>
+
+      <h1 class="welcome-title">Raasta · ராஸ்தா</h1>
+      <p class="welcome-tagline">
+        ${S.lang === "ta" 
+          ? "கிராமப்புற மாணவர்களுக்கான தொழில் வழிகாட்டி. 'எனக்கு என்ன வரும்?' என்பதில் இருந்து 'முதல் வருமானம்' வரை." 
+          : "Google Maps for Careers. From 'What am I good at?' to your first rupee."}
       </p>
-      <div style="background: var(--brand-surface); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px;">
-        <span style="font-size: 14px; font-weight:600; color: var(--brand-primary);">
-          🗣️ பேசுங்கள், தட்டச்சு செய்ய வேண்டாம் (Talk, Don't Type)
-        </span>
+
+      <!-- Language Selection -->
+      <div style="width:100%; text-align:left; font-size:13px; font-weight:700; color:var(--ink-muted); margin-bottom:8px;">
+        ${S.lang === "ta" ? "மொழியைத் தேர்ந்தெடுக்கவும் / Select Language:" : "Select your language:"}
       </div>
-      <p style="font-size: 14px; font-weight: 600; color: var(--ink-secondary); margin-bottom: 12px;">
-        மொழியைத் தேர்ந்தெடுக்கவும் / Choose your language:
-      </p>
-      <div class="grid-2" style="margin-bottom: 12px;">
-        <button class="btn gold" data-act="lang" data-v="ta" style="min-height: 54px; font-size: 18px;">தமிழ்</button>
-        <button class="btn ghost" data-act="lang" data-v="en" style="min-height: 54px; font-size: 17px;">English</button>
+      <div class="lang-grid">
+        <div class="lang-card featured" data-act="lang" data-v="ta">
+          <div>
+            <div class="native-name">தமிழ்</div>
+            <div class="en-sub">Tamil (Default)</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A5C44" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="lang-card" data-act="lang" data-v="en">
+          <div>
+            <div class="native-name">English</div>
+            <div class="en-sub">English</div>
+          </div>
+        </div>
+        <div class="lang-card" data-act="lang" data-v="hi">
+          <div>
+            <div class="native-name">हिन्दी</div>
+            <div class="en-sub">Hindi</div>
+          </div>
+        </div>
+        <div class="lang-card" data-act="lang" data-v="ml">
+          <div>
+            <div class="native-name">മലയാളം</div>
+            <div class="en-sub">Malayalam</div>
+          </div>
+        </div>
       </div>
-      <div class="grid-2">
-        <button class="btn ghost" data-act="lang" data-v="hi" style="min-height: 48px; font-size: 16px;">हिन्दी</button>
-        <button class="btn ghost" data-act="lang" data-v="ml" style="min-height: 48px; font-size: 16px;">മലയാളം</button>
+
+      <!-- Main Action -->
+      <button class="ui-button btn-primary" data-act="start-chat" style="font-size:17px; margin-top:4px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        ${S.lang === "ta" ? "குரல் மூலம் தொடங்குங்கள் (Talk)" : "Start with Voice (Talk)"}
+      </button>
+
+      <!-- Presenter Shortcut -->
+      <div class="demo-fail-safe-bar" style="width:100%; margin-top:14px;">
+        <span style="color:var(--ink-muted);">🎯 Citi Hackathon Demo:</span>
+        <button class="ui-button btn-ghost btn-sm" data-act="kavya">
+          ▶ Demo: Kavya (17, Villupuram)
+        </button>
       </div>
     </div>
-    
-    <div class="demo-cue">
-      <span>💡 Demo Presentation Shortcut:</span>
-      <button class="btn sm ghost" data-act="kavya" style="width: auto; padding: 4px 10px;">▶ Quick Kavya</button>
-    </div>`,
+  `,
 
-  // --- 2. Talk, Don't Type (Conversational Chat) ---
+  // --------------------------------------------------------------------------
+  // SCREEN B: TALK, DON'T TYPE (CONVERSATIONAL AUDIO)
+  // --------------------------------------------------------------------------
   talk: () => {
     const q = QUESTIONS[S.step];
     const progress = Math.min(100, Math.round((S.step / QUESTIONS.length) * 100));
 
     return `
-      <!-- Progress Indicator -->
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:600; color:var(--ink-secondary);">
-        <span>${S.lang === "ta" ? "சுயவிவரப் பதிவு" : "Building Skill Genome"}</span>
-        <span>${S.step} / ${QUESTIONS.length} (${progress}%)</span>
-      </div>
-      <div style="height:6px; background:var(--border-subtle); border-radius:var(--radius-full); overflow:hidden;">
-        <div style="width:${progress}%; height:100%; background:var(--brand-primary); transition:width 0.3s ease;"></div>
+      <div class="talk-header-bar">
+        <div>
+          <span style="font-size:12px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">
+            ${S.lang === "ta" ? "சுயவிவர உரையாடல்" : "Conversational Profiling"}
+          </span>
+          <h2 style="font-size:18px; font-weight:800; color:var(--ink-hero); margin-top:1px;">
+            ${S.lang === "ta" ? "பேசுங்கள், தட்டச்சு வேண்டாம்" : "Talk, Don't Type"}
+          </h2>
+        </div>
+        <span class="step-milestone-pill">${S.step} / ${QUESTIONS.length} (${progress}%)</span>
       </div>
 
-      <!-- Chat Feed -->
-      <div class="chat-feed">
+      <!-- Chat Stream -->
+      <div class="chat-stream">
         ${S.msgs.map(m => `
-          <div class="bubble ${m.who === 'bot' ? 'bot' : 'me'}">
+          <div class="chat-msg ${m.who === 'bot' ? 'bot' : 'me'}">
             ${esc(m.text)}
-            ${m.who === 'bot' ? `<button class="audio-read-btn" data-act="read" data-t="${esc(m.text)}" title="Listen aloud">🔊</button>` : ''}
+            ${m.who === 'bot' ? `
+              <div>
+                <button class="audio-listen-inline" data-act="read" data-t="${esc(m.text)}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  ${S.lang === "ta" ? "கேளுங்கள்" : "Listen"}
+                </button>
+              </div>` : ''}
           </div>
         `).join("")}
       </div>
 
-      <!-- Collected Genome Chips -->
-      ${renderGenomeChips()}
+      <!-- Live Skill Genome Drawer -->
+      ${renderGenomeDrawer()}
 
-      <!-- Question Answer Options -->
+      <!-- Question Answer Section -->
       ${q ? `
-        <div style="margin-top: 4px;">
-          <div style="font-size: 13.5px; font-weight: 600; color: var(--ink-secondary); margin-bottom: 8px;">
-            👇 ${S.lang === "ta" ? "பொருத்தமான ஒன்றைத் தொடவும் அல்லது பேசவும்:" : "Tap an option or speak below:"}
+        <!-- Tactile Options -->
+        <div style="margin-top:2px;">
+          <div style="font-size:13px; font-weight:700; color:var(--ink-muted); margin-bottom:8px;">
+            👇 ${S.lang === "ta" ? "பொருத்தமான ஒன்றைத் தொடவும் அல்லது மைக் மூலம் பேசவும்:" : "Tap an option or speak via microphone:"}
           </div>
-          <div class="${q.options.length > 4 ? 'grid-3' : 'grid-2'}">
+          <div class="tactile-options-grid">
             ${q.options.map((o, idx) => `
-              <button class="opt-btn" data-act="opt" data-i="${idx}">
-                <span class="icon">${o.icon}</span>
-                <span>${esc(L(o))}</span>
+              <button class="tactile-opt-btn" data-act="opt" data-i="${idx}">
+                <div class="opt-icon-circle">${o.icon}</div>
+                <div class="opt-label-main">${esc(L(o))}</div>
               </button>
             `).join("")}
           </div>
         </div>
 
-        <!-- Voice & Type Bar -->
-        <div class="card" style="padding: 10px 14px; margin-top: 6px;">
-          <div class="voice-controls">
-            <button class="mic-btn" id="mic" data-act="mic" title="${S.lang === 'ta' ? 'குரல் மூலம் பேசவும்' : 'Speak'}">
+        <!-- Voice Interaction Dock -->
+        <div class="voice-interaction-dock">
+          <div class="mic-button-wrapper">
+            <button class="mic-orb" id="micOrb" data-act="mic" title="Tap to Speak">
               <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
             </button>
-            <div class="text-input-wrap">
-              <input type="text" id="typed" placeholder="${S.lang === 'ta' ? 'அல்லது இங்கே எழுதவும்...' : 'or type your answer...'}">
-              <div id="micStatus" style="font-size: 11px; color: var(--ink-tertiary); margin-top: 4px;">
-                <span class="mic-hint-chip">🎙️ ${S.lang === "ta" ? "பேச மைக் தொடவும்" : "Tap mic to speak"}</span>
-              </div>
-            </div>
+          </div>
+
+          <div class="voice-waves">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+          </div>
+
+          <div class="voice-status-text" id="micStatusText">
+            ${S.lang === "ta" ? "பேச மைக் தொடவும் (Tap mic to speak)" : "Tap mic to speak"}
+          </div>
+
+          <div style="width:100%; display:flex; gap:8px;">
+            <input type="text" id="typedInput" placeholder="${S.lang === 'ta' ? 'அல்லது இங்கே எழுதவும்...' : 'or type here...'}" style="flex:1; padding:10px 14px; border:1px solid var(--border-hairline); border-radius:var(--radius-md); font-size:14px; background:var(--bg-page); color:var(--ink-hero);">
+            <button class="ui-button btn-ghost btn-sm" id="typedSendBtn" style="width:auto; padding:0 14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
           </div>
         </div>
-
-        <!-- Presenter Shortcut -->
-        <div class="demo-cue" style="margin-top:4px;">
-          <span>🎯 Live Demo Preset:</span>
-          <button class="btn sm ghost" data-act="kavya" style="width:auto; padding:3px 8px;">▶ Demo: Kavya's Answers</button>
-        </div>
       ` : `
-        <button class="btn gold" data-act="go" data-v="careers" style="margin-top: 12px; font-size: 17px; padding: 16px;">
-          🧭 ${S.lang === 'ta' ? 'உங்களுக்கான வழிகளைப் பார்க்கவும்' : 'See My Matched Routes'} →
+        <button class="ui-button btn-gold" data-act="go" data-v="careers" style="font-size:17px; padding:16px;">
+          🧭 ${S.lang === "ta" ? "உங்களுக்கான வழிகளைப் பார்க்கவும் (See Routes)" : "See My Matched Routes"} →
         </button>
       `}
     `;
   },
 
-  // --- 3. Careers ("Your Routes") ---
+  // --------------------------------------------------------------------------
+  // SCREEN D: CAREER ROUTES (HIGH DIGNITY CARDS)
+  // --------------------------------------------------------------------------
   careers: () => {
     const matched = matchCareers(S.profile);
     return `
       <div>
-        <h1>${S.lang === "ta" ? "உங்களுக்கான தொழில் வழிகள்" : "Career Routes for You"}</h1>
-        <p class="muted">
-          ${S.lang === "ta" ? "உங்கள் திறன்கள் மற்றும் ஆர்வங்களின் அடிப்படையில் அமைந்தவை" : "Personalized paths based on your Skill Genome"}
+        <span style="font-size:12px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">
+          ${S.lang === "ta" ? "திறன் வரைபடம் முடிவுகள்" : "Career Recommendations"}
+        </span>
+        <h1 style="font-size:22px; font-weight:800; color:var(--ink-hero); margin-top:2px;">
+          ${S.lang === "ta" ? "உங்களுக்கான தொழில் வழிகள்" : "Career Routes for You"}
+        </h1>
+        <p style="font-size:13.5px; color:var(--ink-muted); margin-top:2px;">
+          ${S.lang === "ta" ? "தொழிற்கல்வி மற்றும் வளரும் துறைகள் சமமான மரியாதையுடன் பரிந்துரைக்கப்பட்டுள்ளன." : "Vocational, emerging, and degree tracks evaluated with equal prestige."}
         </p>
       </div>
 
-      ${renderGenomeChips()}
+      ${renderGenomeDrawer()}
 
-      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
         ${matched.map(c => `
-          <div class="career-card">
-            <div class="row between">
-              <span class="tag-badge tag-${c.type}">${c.type}</span>
-              <button class="audio-read-btn" data-act="read" data-t="${esc(L(c.title))}. ${esc(c.why)}. ${esc(c.earn)}">🔊</button>
+          <div class="career-card-elevated">
+            <div class="career-header-row">
+              <span class="ui-badge badge-${c.type}">${c.type}</span>
+              <button class="audio-listen-inline" data-act="read" data-t="${esc(L(c.title))}. ${esc(c.why)}. ${esc(c.earn)}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              </button>
             </div>
-            <h2>${esc(L(c.title))}</h2>
-            <div class="muted" style="color: var(--ink-secondary);">💡 ${esc(c.why)}</div>
-            <div class="earn-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
-              <span>${esc(c.earn)}</span>
+
+            <div class="career-title">${esc(L(c.title))}</div>
+
+            <div class="career-why-block">
+              💡 ${esc(c.why)}
             </div>
-            <button class="btn" data-act="career" data-v="${c.id}">
-              🗺️ ${S.lang === "ta" ? "கல்விப் பாதையைப் பார்" : "See Pathway"}
+
+            <div class="row-between" style="margin-top:2px;">
+              <div class="career-salary-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+                <span>${esc(c.earn)}</span>
+              </div>
+            </div>
+
+            <button class="ui-button btn-primary" data-act="career" data-v="${c.id}" style="margin-top:4px;">
+              🗺️ ${S.lang === "ta" ? "கல்விப் பாதையைக் காண்க (Pathway)" : "Explore Learning Pathway"} →
             </button>
           </div>
         `).join("")}
@@ -314,56 +433,78 @@ const views = {
     `;
   },
 
-  // --- 4. Opportunity Radar (Deterministic Rules) ---
+  // --------------------------------------------------------------------------
+  // SCREEN E: OPPORTUNITY RADAR (AUDITABLE SCHOLARSHIPS)
+  // --------------------------------------------------------------------------
   radar: () => {
     const opps = eligibility(S.profile);
     const eligibleCount = opps.filter(o => o.status === "eligible").length;
 
     return `
       <div>
-        <h1>🎯 Opportunity Radar</h1>
-        <p class="muted">
+        <span style="font-size:12px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">
+          ${S.lang === "ta" ? "அரசு உதவித்தொகை ரேடார்" : "Financial Support Radar"}
+        </span>
+        <h1 style="font-size:22px; font-weight:800; color:var(--ink-hero); margin-top:2px;">
+          🎯 Opportunity Radar
+        </h1>
+        <p style="font-size:13px; color:var(--ink-muted); margin-top:2px;">
           ${S.lang === "ta" 
-            ? "அரசு விதிகளின்படி நீங்கள் பெறக்கூடிய உதவித்தொகைகள். (AI முடிவு செய்யாது)" 
-            : "Evaluated by deterministic rules engine, not AI. Every scheme links to official gazette."}
+            ? "அரசு விதிகளின்படி நீங்கள் பெறக்கூடிய உதவித்தொகைகள். (AI முடிவு செய்யாது, விதிகள் முடிவு செய்யும்)." 
+            : "Deterministic rules engine evaluation. The LLM never decides eligibility."}
         </p>
       </div>
 
-      <div class="card-highlight" style="display:flex; justify-content:space-between; align-items:center;">
+      <!-- Stat Banner -->
+      <div class="radar-stat-banner">
         <div>
-          <div style="font-size: 13px; font-weight: 600; color: var(--brand-primary);">${S.lang === "ta" ? "உங்களுக்குக் கிடைக்கும் உதவி" : "Verified Opportunities"}</div>
-          <div style="font-size: 20px; font-weight: 700;">${eligibleCount} ${S.lang === "ta" ? "திட்டங்களுக்கு தகுதி" : "Eligible Schemes"}</div>
+          <div style="font-size:12px; font-weight:700; opacity:0.85; text-transform:uppercase;">
+            ${S.lang === "ta" ? "உறுதிசெய்யப்பட்ட பலன்" : "Financial Aid Unlocked"}
+          </div>
+          <div style="font-size:22px; font-weight:800; margin-top:2px;">
+            ${eligibleCount} ${S.lang === "ta" ? "திட்டங்களுக்கு தகுதி" : "Eligible Opportunities"}
+          </div>
         </div>
-        <div style="font-size: 32px;">🎓</div>
+        <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+      <!-- Scheme Cards -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
         ${opps.map(o => `
-          <div class="card" style="border-left: 4px solid ${{ eligible: "var(--status-eligible-ink)", maybe: "var(--status-maybe-ink)", not_eligible: "var(--status-not-eligible-ink)" }[o.status]};">
-            <div class="row between">
-              <h3 style="flex:1;">${esc(o.name)}</h3>
-              <span class="status-pill ${o.status}">
-                ${{ eligible: "✅ Eligible", maybe: "❔ Maybe", not_eligible: "✖ Not Eligible" }[o.status]}
+          <div class="scheme-card ${o.status}">
+            <div class="row-between">
+              <h3 style="font-size:16px; font-weight:800; color:var(--ink-hero); flex:1;">${esc(o.name)}</h3>
+              <span class="ui-badge ${o.status === 'eligible' ? 'badge-govt' : (o.status === 'not_eligible' ? 'badge-vocational' : 'badge-emerging')}">
+                ${{ eligible: "✔ Eligible", maybe: "❔ Needs Info", not_eligible: "✖ Not Eligible" }[o.status]}
               </span>
             </div>
 
-            <div class="benefit-callout">💰 ${esc(o.benefit)}</div>
+            <div class="scheme-benefit-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+              <span>${esc(o.benefit)}</span>
+            </div>
 
-            <ul class="reasons-list">
+            <ul class="rule-checklist">
               ${o.reasons.map(r => `
                 <li>
-                  <span>${r.passed === true ? "✅" : r.passed === false ? "❌" : "❔"}</span>
-                  <span style="${r.passed === false ? 'color: var(--status-not-eligible-ink); font-weight: 600;' : ''}">${esc(r.text)}</span>
+                  <span style="color:${r.passed === true ? 'var(--status-eligible-ink)' : (r.passed === false ? 'var(--status-not-eligible-ink)' : 'var(--status-maybe-ink)')}; font-weight:800;">
+                    ${r.passed === true ? '✔' : (r.passed === false ? '✖' : '❔')}
+                  </span>
+                  <span style="${r.passed === false ? 'color:var(--status-not-eligible-ink); font-weight:600;' : ''}">${esc(r.text)}</span>
                 </li>
               `).join("")}
             </ul>
 
-            <div class="row between" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-subtle);">
-              <a href="${o.source_url}" target="_blank" rel="noopener" class="official-link">
+            <div class="row-between" style="margin-top:6px; padding-top:8px; border-top:1px solid var(--border-hairline);">
+              <a href="${o.source_url}" target="_blank" rel="noopener" class="source-link-chip">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                ${S.lang === "ta" ? "அதிகாரப்பூர்வ இணையதளம்" : "Official portal"}
+                ${S.lang === "ta" ? "அதிகாரப்பூர்வ இணையதளம்" : "Official Gazette / Portal"}
               </a>
-              ${o.verified ? `<span style="font-size:11px; color:var(--status-eligible-ink); font-weight:600;">🛡️ Verified</span>` : `<span class="verify-notice">⚠ Demo rule</span>`}
+              ${o.verified 
+                ? `<span style="font-size:11.5px; color:var(--status-eligible-ink); font-weight:700; display:flex; align-items:center; gap:4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Verified</span>` 
+                : `<span style="font-size:11px; color:var(--gold-primary); font-weight:600;">⚠ Pending Recheck</span>`}
             </div>
           </div>
         `).join("")}
@@ -371,71 +512,169 @@ const views = {
     `;
   },
 
-  // --- 5. My Pathway & Parent Mode ---
+  // --------------------------------------------------------------------------
+  // SCREEN F: MY PATHWAY ("RAASTA" ROAD TIMELINE)
+  // --------------------------------------------------------------------------
   pathway: () => {
     const c = CAREERS.find(c => c.id === S.careerId) || matchCareers(S.profile)[0] || CAREERS[0];
     S.careerId = c.id;
 
     return `
       <div>
-        <div class="row between">
-          <span class="tag-badge tag-${c.type}">${c.type}</span>
-          <button class="btn sm ghost" data-act="go" data-v="careers" style="width:auto;">← ${S.lang === 'ta' ? 'அனைத்து வழிகள்' : 'All Routes'}</button>
+        <div class="row-between">
+          <span class="ui-badge badge-${c.type}">${c.type}</span>
+          <button class="ui-button btn-ghost btn-sm" data-act="go" data-v="careers">← ${S.lang === 'ta' ? 'அனைத்து வழிகள்' : 'All Routes'}</button>
         </div>
-        <h1 style="margin-top:4px;">🗺️ ${esc(L(c.title))}</h1>
-        <p class="muted">💡 ${esc(c.why)}</p>
+        <h1 style="font-size:22px; font-weight:800; color:var(--ink-hero); margin-top:4px;">
+          🗺️ ${esc(L(c.title))}
+        </h1>
+        <p style="font-size:13.5px; color:var(--ink-muted); margin-top:2px;">💡 ${esc(c.why)}</p>
       </div>
 
-      <!-- Parent Mode Golden Moment -->
-      <div class="parent-box">
-        <div class="row between">
-          <b style="color: #92400E; font-size: 15px;">👨‍👩‍👧 Parent Mode · பெற்றோர் வழிகாட்டி</b>
-          <span style="font-size: 12px; background: rgba(217, 119, 6, 0.2); padding: 2px 8px; border-radius: var(--radius-full); font-weight: 600;">Tamil Audio</span>
+      <!-- PARENT MODE EMOTIONAL HIGHLIGHT -->
+      <div class="parent-trust-box">
+        <div class="parent-heading">
+          <h3>👨‍👩‍👧 Parent Mode · பெற்றோர் வழிகாட்டி</h3>
+          <span class="ui-badge" style="background:#FDE68A; color:#78350F; border:1px solid #F59E0B;">Tamil Voice</span>
         </div>
-        <p style="font-size: 13.5px; color: #78350F; margin: 0;">
+        <p style="font-size:13.5px; color:#78350F; line-height:1.5;">
           ${S.lang === "ta" 
-            ? "உங்கள் குடும்பத்தினருக்கு இந்த படிப்பின் பாதுகாப்பு, உதவித்தொகை மற்றும் வருமான விவரங்களை தமிழில் ஒலிவடிவில் கேட்கச் செய்யுங்கள்." 
-            : "Play a respectful audio summary in regional dialect for family covering safety, cost, and earnings."}
+            ? "பெற்றோருக்கு இந்த படிப்பின் பாதுகாப்பு, அரசு உதவித்தொகை மற்றும் ஆரம்ப வருமானம் பற்றி தமிழில் விளக்கும் குரல் பதிவு." 
+            : "Spoken Tamil briefing for the family addressing duration, safety, cost relief, and starting income."}
         </p>
-        <button class="btn gold" data-act="parent" style="min-height: 52px; font-size: 16px;">
-          🔊 ${S.lang === "ta" ? "பெற்றோருக்கு ஒலிக்கவும் (Play Audio)" : "Play for Family 🔊"}
-        </button>
-        <div id="parentTextWrap" style="display:none;" class="parent-transcript">
-          <div id="parentText"></div>
+
+        <div class="parent-audio-player-bar">
+          <button class="ui-button btn-gold" id="parentPlayBtn" data-act="parent" style="flex:1;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            ${S.lang === "ta" ? "பெற்றோருக்கு ஒலிக்கவும் (Play)" : "Play for Family"}
+          </button>
+        </div>
+
+        <div class="parent-transcript-sheet" id="parentTranscriptSheet" style="display:none;">
+          <div style="font-size:12px; font-weight:800; color:#92400E; margin-bottom:4px; text-transform:uppercase;">Transcript / உரை:</div>
+          <div id="parentTranscriptText"></div>
         </div>
       </div>
 
-      <!-- Vertical Roadmap ("Raasta") -->
-      <div class="card">
-        <h3>🛣️ ${S.lang === "ta" ? "படிப்பு மற்றும் வேலைவாய்ப்பு வழி (Raasta)" : "Week-by-Week Learning Pathway"}</h3>
-        <div class="pathway-timeline">
+      <!-- VERTICAL ROAD TIMELINE -->
+      <div class="ui-card">
+        <h3 style="font-size:16px; font-weight:800; color:var(--ink-hero); margin-bottom:8px;">
+          🛣️ ${S.lang === "ta" ? "வாராந்திர கற்றல் பாதை (Raasta Pathway)" : "Week-by-Week Learning Route"}
+        </h3>
+        
+        <div class="road-journey">
           ${c.path.map((p, i) => `
-            <div class="timeline-step">
-              <div class="step-week">Week ${i * 2 + 1} - ${i * 2 + 2}</div>
-              <div class="step-goal">${esc(p[0])}</div>
+            <div class="journey-station">
+              <div class="station-pin"></div>
+              <div class="station-time">Milestone ${i + 1} · Week ${i * 2 + 1} - ${i * 2 + 2}</div>
+              <div class="station-goal">${esc(p[0])}</div>
               ${p[2] 
-                ? `<a href="${p[2]}" target="_blank" rel="noopener" class="official-link">🔗 ${esc(p[1])}</a>` 
-                : `<span class="muted">${esc(p[1])}</span>`}
+                ? `<a href="${p[2]}" target="_blank" rel="noopener" class="source-link-chip">🔗 ${esc(p[1])}</a>` 
+                : `<span style="font-size:12.5px; color:var(--ink-muted);">${esc(p[1])}</span>`}
             </div>
           `).join("")}
         </div>
       </div>
 
-      <!-- Entrance Exams -->
-      <div class="card">
-        <h3>📝 ${S.lang === "ta" ? "தேவையான நுழைவுத் தேர்வுகள்" : "Required Exams & Admissions"}</h3>
-        <div style="margin-top: 8px;">
-          ${c.exams.map(e => `<span class="chip" style="margin-right: 6px; margin-bottom: 6px;">📋 ${esc(e)}</span>`).join("")}
+      <!-- EXAMS -->
+      <div class="ui-card">
+        <h3 style="font-size:15px; font-weight:800; color:var(--ink-hero);">
+          📝 ${S.lang === "ta" ? "நுழைவுத் தேர்வுகள் & சேர்க்கை" : "Entrance Exams & Admission"}
+        </h3>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+          ${c.exams.map(e => `
+            <span style="background:var(--brand-surface); color:var(--brand-primary); padding:4px 10px; border-radius:var(--radius-full); font-size:12.5px; font-weight:700;">
+              📋 ${esc(e)}
+            </span>
+          `).join("")}
         </div>
       </div>
 
-      <button class="btn" data-act="go" data-v="radar">
-        🎯 ${S.lang === "ta" ? "இவர்களுக்கான உதவித்தொகைகளைப் பார்" : "View Eligible Scholarships"} →
+      <button class="ui-button btn-primary" data-act="go" data-v="radar">
+        🎯 ${S.lang === "ta" ? "உதவித்தொகைகளைப் பார்க்கவும் (View Scholarships)" : "View Eligible Scholarships"} →
       </button>
     `;
   },
 
-  // --- 6. Facilitator Mode (Teacher Dashboard with Filter Tabs) ---
+  // --------------------------------------------------------------------------
+  // SCREEN G: PROFILE / "ABOUT ME" (EDITABLE CHIPS)
+  // --------------------------------------------------------------------------
+  profile: () => {
+    const isDone = isProfileComplete();
+    const name = S.profile.name || (S.lang === "ta" ? "காவ்யா" : "Kavya");
+    const flag = talentFlag(S.profile);
+
+    return `
+      <div>
+        <div class="row-between">
+          <div>
+            <span style="font-size:12px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">
+              ${S.lang === "ta" ? "மாணவர் சுயவிவரம்" : "Student Profile"}
+            </span>
+            <h1 style="font-size:22px; font-weight:800; color:var(--ink-hero); margin-top:2px;">
+              👤 ${esc(name)} ${flag ? `<span class="talent-star-badge">⭐</span>` : ""}
+            </h1>
+          </div>
+          <button class="ui-button btn-ghost btn-sm" data-act="go" data-v="talk">← ${S.lang === 'ta' ? 'உரையாடல்' : 'Chat'}</button>
+        </div>
+        <p style="font-size:13px; color:var(--ink-muted); margin-top:2px;">Villupuram, Tamil Nadu · Govt School Cohort</p>
+      </div>
+
+      <div class="ui-card">
+        <div class="row-between" style="margin-bottom:12px;">
+          <b style="font-size:15px; color:var(--ink-hero);">Skill Genome Attributes</b>
+          <span class="ui-badge ${isDone ? 'badge-govt' : 'badge-emerging'}">
+            ${isDone ? (S.lang === "ta" ? "முழுமையானது" : "100% Completed") : "In Progress"}
+          </span>
+        </div>
+
+        <div class="genome-deck">
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">🧵 ${S.lang === "ta" ? "ஆர்வங்கள் & திறன்கள்" : "Skills & Interests"}</span>
+            <span class="genome-attr-value">${(S.profile.interests || []).join(", ") || "-"}</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">🎂 ${S.lang === "ta" ? "வயது" : "Age"}</span>
+            <span class="genome-attr-value">${S.profile.age || "-"}</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">📘 ${S.lang === "ta" ? "கல்வி நிலை" : "Education"}</span>
+            <span class="genome-attr-value">${S.profile.education || "Class 11-12"}</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">🏫 ${S.lang === "ta" ? "பள்ளி வகை" : "School Type"}</span>
+            <span class="genome-attr-value">${S.profile.govt_school ? (S.lang === "ta" ? "அரசுப் பள்ளி" : "Govt School") : "Private"}</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">👥 ${S.lang === "ta" ? "சமூகப் பிரிவு" : "Category"}</span>
+            <span class="genome-attr-value">${(S.profile.category || "OBC").toUpperCase()}</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">💰 ${S.lang === "ta" ? "ஆண்டு வருமானம்" : "Income"}</span>
+            <span class="genome-attr-value">₹${S.profile.family_income_lakh || 2.0} Lakh/year</span>
+          </div>
+          <div class="genome-attribute-row">
+            <span class="genome-attr-label">📝 ${S.lang === "ta" ? "மதிப்பெண்" : "Marks"}</span>
+            <span class="genome-attr-value">${S.profile.marks_percent || 82}%</span>
+          </div>
+        </div>
+
+        ${flag ? `
+          <div style="background:var(--gold-surface); border:1px solid var(--gold-border); border-radius:var(--radius-md); padding:10px 12px; margin-top:12px; font-size:12.5px; color:var(--gold-ink);">
+            ⭐ <b>AI Talent Flag Active:</b> Marks $\ge$80% and demonstrated vocational stitching skill. Flagged for Facilitator priority recommendation.
+          </div>
+        ` : ''}
+      </div>
+
+      <button class="ui-button btn-gold" data-act="go" data-v="careers">
+        🧭 ${S.lang === "ta" ? "தொழில் வழிகளைக் காண்க" : "View Matched Routes"} →
+      </button>
+    `;
+  },
+
+  // --------------------------------------------------------------------------
+  // SCREEN H: FACILITATOR MODE (TEACHER DASHBOARD)
+  // --------------------------------------------------------------------------
   facilitator: () => {
     let rows = STUDENTS.map(s => {
       const isDemoKavya = s.name === "Kavya" && isProfileComplete();
@@ -459,155 +698,87 @@ const views = {
 
     return `
       <div>
-        <h1>👩‍🏫 Facilitator Mode</h1>
-        <p class="muted">Govt Higher Secondary School, Villupuram · 60+ Students Cohort</p>
+        <span style="font-size:12px; font-weight:700; color:var(--ink-muted); text-transform:uppercase;">
+          ${S.lang === "ta" ? "ஆசிரியர் டாஷ்போர்டு" : "Teacher Enablement"}
+        </span>
+        <h1 style="font-size:22px; font-weight:800; color:var(--ink-hero); margin-top:2px;">
+          👩‍🏫 Facilitator Mode
+        </h1>
+        <p style="font-size:13px; color:var(--ink-muted); margin-top:2px;">
+          Govt Higher Secondary School, Villupuram · 60 Students Cohort
+        </p>
       </div>
 
-      <!-- Cohort Summary Metrics -->
-      <div class="card" style="padding:12px; display:flex; justify-content:space-around; text-align:center;">
-        <div>
-          <div style="font-size:22px; font-weight:700; color:var(--brand-primary);">${STUDENTS.length}</div>
-          <div class="muted" style="font-size:12px;">Active Students</div>
+      <!-- KPI Metrics -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+        <div class="ui-card" style="padding:12px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:var(--brand-primary);">${STUDENTS.length}</div>
+          <div style="font-size:11px; font-weight:600; color:var(--ink-muted);">Enrolled</div>
         </div>
-        <div style="border-right:1px solid var(--border-subtle);"></div>
-        <div>
-          <div style="font-size:22px; font-weight:700; color:var(--accent-gold);">${STUDENTS.filter(s => talentFlag(s)).length}</div>
-          <div class="muted" style="font-size:12px;">⭐ Talent Flags</div>
+        <div class="ui-card" style="padding:12px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:var(--gold-primary);">${STUDENTS.filter(s => talentFlag(s)).length}</div>
+          <div style="font-size:11px; font-weight:600; color:var(--ink-muted);">⭐ Talent Flags</div>
         </div>
-        <div style="border-right:1px solid var(--border-subtle);"></div>
-        <div>
-          <div style="font-size:22px; font-weight:700; color:var(--status-eligible-ink);">${Object.keys(S.recommended).length}</div>
-          <div class="muted" style="font-size:12px;">Recommended</div>
+        <div class="ui-card" style="padding:12px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:var(--status-eligible-ink);">${Object.keys(S.recommended).length}</div>
+          <div style="font-size:11px; font-weight:600; color:var(--ink-muted);">Endorsed</div>
         </div>
       </div>
 
       <!-- Filter Bar -->
-      <div class="filter-bar">
-        <button class="filter-pill ${S.facilitatorFilter === 'all' ? 'active' : ''}" data-act="filter-fac" data-v="all">
+      <div class="fac-filter-bar">
+        <button class="fac-tab-btn ${S.facilitatorFilter === 'all' ? 'active' : ''}" data-act="filter-fac" data-v="all">
           All (${STUDENTS.length})
         </button>
-        <button class="filter-pill ${S.facilitatorFilter === 'flagged' ? 'active' : ''}" data-act="filter-fac" data-v="flagged">
-          ⭐ Talent Flagged (${STUDENTS.filter(s => talentFlag(s)).length})
+        <button class="fac-tab-btn ${S.facilitatorFilter === 'flagged' ? 'active' : ''}" data-act="filter-fac" data-v="flagged">
+          ⭐ Talent Flags (${STUDENTS.filter(s => talentFlag(s)).length})
         </button>
-        <button class="filter-pill ${S.facilitatorFilter === 'rec' ? 'active' : ''}" data-act="filter-fac" data-v="rec">
-          ✅ Recommended (${Object.keys(S.recommended).length})
+        <button class="fac-tab-btn ${S.facilitatorFilter === 'rec' ? 'active' : ''}" data-act="filter-fac" data-v="rec">
+          ✔ Endorsed (${Object.keys(S.recommended).length})
         </button>
       </div>
 
-      <!-- Table View -->
-      <div class="card" style="padding: 10px; overflow-x: auto;">
-        <table class="students-table">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Top Route</th>
-              <th>Eligible</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(({ s, student_id, name, top, eligibleCount, flag, isRecommended }) => `
-              <tr>
-                <td>
-                  <b>${esc(name)}</b>
-                  ${flag ? `<span class="talent-star" title="AI Talent Flag (High marks / multiple skills)">⭐</span>` : ""}
-                  <div class="muted" style="font-size:11px;">${esc(s.district || "Villupuram")}</div>
-                </td>
-                <td style="font-size:12.5px;">${top ? esc(top.title.en) : "-"}</td>
-                <td style="font-weight:700; color:var(--brand-primary);">${eligibleCount}</td>
-                <td>
-                  ${isRecommended 
-                    ? `<span style="color:var(--status-eligible-ink); font-weight:700; font-size:12px;">✅ Sent</span>` 
-                    : `<button class="btn sm" data-act="rec" data-v="${student_id}" style="padding:4px 8px; font-size:12px;">Recommend</button>`}
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
+      <!-- Student Card List -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${rows.map(({ s, student_id, name, top, eligibleCount, flag, isRecommended }) => `
+          <div class="student-row-card">
+            <div>
+              <div style="font-size:15px; font-weight:700; color:var(--ink-hero); display:flex; align-items:center;">
+                ${esc(name)}
+                ${flag ? `<span class="talent-star-badge" title="AI Talent Flag">⭐</span>` : ""}
+              </div>
+              <div style="font-size:12.5px; color:var(--ink-muted); margin-top:1px;">
+                ${top ? esc(top.title.en) : "-"}
+              </div>
+              <div style="font-size:11.5px; color:var(--brand-primary); font-weight:700; margin-top:2px;">
+                ${eligibleCount} Scholarships Eligible
+              </div>
+            </div>
+
+            <div>
+              ${isRecommended 
+                ? `<span style="color:var(--status-eligible-ink); font-weight:800; font-size:12px; display:inline-flex; align-items:center; gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Sent</span>` 
+                : `<button class="ui-button btn-primary btn-sm" data-act="rec" data-v="${student_id}">Recommend</button>`}
+            </div>
+          </div>
+        `).join("")}
       </div>
-      <p class="muted" style="font-size: 12px; margin-top: 4px;">
-        ⭐ = AI Talent Flag (Marks $\ge$80% or multiple practical skills). The teacher verifies and endorses.
+
+      <p style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
+        ⭐ = AI Talent Flag: surfaces learners with high academic marks or diverse vocational skills. The facilitator confirms with one tap.
       </p>
-    `;
-  },
-
-  // --- 7. Profile / "About Me" (Editable Chips) ---
-  profile: () => {
-    const isDone = isProfileComplete();
-    const name = S.profile.name || (S.lang === "ta" ? "காவ்யா" : "Kavya");
-    const flag = talentFlag(S.profile);
-
-    return `
-      <div>
-        <div class="row between">
-          <h1>👤 ${S.lang === "ta" ? "மாணவர் சுயவிவரம்" : "About Me · Skill Genome"}</h1>
-          <button class="btn sm ghost" data-act="go" data-v="talk" style="width:auto;">← ${S.lang === 'ta' ? 'உரையாடல்' : 'Chat'}</button>
-        </div>
-        <p class="muted">
-          ${S.lang === "ta" 
-            ? "உங்கள் பதில்களின் அடிப்படையில் சேகரிக்கப்பட்ட தகவல்கள். மாற்ற விரும்பினால் தட்டவும்." 
-            : "Your verified Skill Genome. Tap any item to adjust."}
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="row between" style="margin-bottom: 12px;">
-          <div>
-            <h2 style="font-size: 20px;">${esc(name)} ${flag ? `<span class="talent-star">⭐</span>` : ""}</h2>
-            <div class="muted">Villupuram, Tamil Nadu</div>
-          </div>
-          <span class="status-pill ${isDone ? 'eligible' : 'maybe'}">
-            ${isDone ? (S.lang === "ta" ? "நிறைவுற்றது" : "Verified") : (S.lang === "ta" ? "பதிவில்..." : "In progress")}
-          </span>
-        </div>
-
-        <div style="font-size: 13.5px;">
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "ஆர்வங்கள் & திறன்கள்" : "Interests & Skills"}</span>
-            <b>${(S.profile.interests || []).map(i => `🧵 ${i}`).join(", ") || "-"}</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "வயது" : "Age"}</span>
-            <b>${S.profile.age || "-"}</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "படிப்பு" : "Education"}</span>
-            <b>${S.profile.education || "Class 11-12"}</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "பள்ளி வகை" : "School"}</span>
-            <b>${S.profile.govt_school ? (S.lang === "ta" ? "அரசுப் பள்ளி" : "Govt School") : "Private"}</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "சமூகப் பிரிவு" : "Category"}</span>
-            <b>${(S.profile.category || "OBC").toUpperCase()}</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "குடும்ப வருமானம்" : "Income"}</span>
-            <b>₹${S.profile.family_income_lakh || 2.0} Lakh/year</b>
-          </div>
-          <div class="profile-row">
-            <span class="muted">${S.lang === "ta" ? "மதிப்பெண்" : "Marks"}</span>
-            <b>${S.profile.marks_percent || 82}%</b>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn gold" data-act="go" data-v="careers">
-        🧭 ${S.lang === "ta" ? "தொழில் வழிகளைப் பார்க்கவும்" : "View Matched Routes"} →
-      </button>
     `;
   }
 };
 
-// ==========================================
-// 4. MAIN RENDER LOOP & EVENT DISPATCHER
-// ==========================================
+// ============================================================================
+// 5. MAIN RENDER LOOP & EVENT HANDLERS
+// ============================================================================
 function render() {
   const currentView = S.lang ? S.view : "start";
-  $("#view").innerHTML = (views[currentView] || views.start)();
+  $("#viewContainer").innerHTML = (views[currentView] || views.start)();
   
-  const nav = $("#nav");
+  const nav = $("#appNavbar");
   if (nav) nav.style.display = S.lang ? "grid" : "none";
   
   const profileHeaderBtn = $("#profileHeaderBtn");
@@ -615,12 +786,12 @@ function render() {
     profileHeaderBtn.style.display = S.lang && isProfileComplete() ? "inline-flex" : "none";
   }
 
-  document.querySelectorAll("nav button").forEach(b => {
-    b.classList.toggle("on", b.dataset.v === currentView);
+  document.querySelectorAll("nav.app-navbar button").forEach(b => {
+    b.classList.toggle("active", b.dataset.v === currentView);
     b.disabled = b.dataset.v !== "talk" && b.dataset.v !== "facilitator" && !isProfileComplete();
   });
 
-  const typedInput = $("#typed");
+  const typedInput = $("#typedInput");
   if (typedInput) {
     typedInput.onkeydown = e => {
       if (e.key === "Enter" && typedInput.value.trim()) {
@@ -628,33 +799,45 @@ function render() {
       }
     };
   }
+  
+  const typedSendBtn = $("#typedSendBtn");
+  if (typedSendBtn) {
+    typedSendBtn.onclick = () => {
+      if (typedInput && typedInput.value.trim()) {
+        processSpeechInput(typedInput.value.trim());
+      }
+    };
+  }
+
   window.scrollTo(0, 0);
 }
 
 function navigateTo(viewName) {
   S.view = viewName;
+  Voice.stopSpeak();
   render();
 }
 
-// Global click event handler
+// Global click event dispatcher
 document.addEventListener("click", e => {
-  const target = e.target.closest("[data-act], nav button, #themeToggle, #brandLink");
+  const target = e.target.closest("[data-act], nav.app-navbar button, #themeToggleBtn, #headerBrand");
   if (!target) return;
 
-  if (target.id === "brandLink") {
+  if (target.id === "headerBrand") {
     e.preventDefault();
     if (S.lang) navigateTo("talk");
     return;
   }
 
-  if (target.id === "themeToggle") {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+  if (target.id === "themeToggleBtn") {
+    const doc = document.documentElement;
+    const isDark = doc.getAttribute("data-theme") === "dark";
+    doc.setAttribute("data-theme", isDark ? "light" : "dark");
     return;
   }
 
-  // Bottom navigation tab click
-  if (target.tagName === "BUTTON" && target.closest("nav") && target.dataset.v) {
+  // Bottom navbar navigation
+  if (target.tagName === "BUTTON" && target.closest("nav.app-navbar") && target.dataset.v) {
     return navigateTo(target.dataset.v);
   }
 
@@ -663,7 +846,11 @@ document.addEventListener("click", e => {
 
   if (action === "lang") {
     S.lang = target.dataset.v;
-    S.view = "talk";
+    navigateTo("talk");
+    askQuestion();
+  }
+  else if (action === "start-chat") {
+    navigateTo("talk");
     askQuestion();
   }
   else if (action === "opt") {
@@ -684,14 +871,18 @@ document.addEventListener("click", e => {
     navigateTo("pathway");
   }
   else if (action === "parent") {
-    const script = parentScriptText();
-    const wrap = $("#parentTextWrap");
-    const textBox = $("#parentText");
-    if (wrap && textBox) {
-      wrap.style.display = "block";
-      textBox.textContent = "🔊 " + script;
+    if (S.isPlayingAudio) {
+      Voice.stopSpeak();
+    } else {
+      const script = parentScriptText();
+      const sheet = $("#parentTranscriptSheet");
+      const textBox = $("#parentTranscriptText");
+      if (sheet && textBox) {
+        sheet.style.display = "block";
+        textBox.textContent = script;
+      }
+      Voice.speak(script, S.lang || "ta");
     }
-    Voice.speak(script, S.lang || "ta");
   }
   else if (action === "rec") {
     const id = target.dataset.v;
@@ -709,30 +900,41 @@ document.addEventListener("click", e => {
   }
 });
 
-// Network status listener
-function updateNetworkStatus() {
+// Network status updater
+function syncNetwork() {
   const isOnline = navigator.onLine;
-  const netBadge = $("#net");
-  const netText = $("#netText");
-  if (netBadge && netText) {
+  const ind = $("#netIndicator");
+  const lbl = $("#netLabel");
+  if (ind && lbl) {
     if (isOnline) {
-      netBadge.classList.remove("offline");
-      netText.textContent = "online";
+      ind.classList.remove("offline");
+      lbl.textContent = "online";
     } else {
-      netBadge.classList.add("offline");
-      netText.textContent = S.lang === "ta" ? "ஆஃப்லைன்: செயல்படும்" : "offline: working";
+      ind.classList.add("offline");
+      lbl.textContent = S.lang === "ta" ? "ஆஃப்லைன்: செயல்படும்" : "offline: working";
     }
   }
 }
 
-window.addEventListener("online", updateNetworkStatus);
-window.addEventListener("offline", updateNetworkStatus);
-updateNetworkStatus();
+window.addEventListener("online", syncNetwork);
+window.addEventListener("offline", syncNetwork);
+syncNetwork();
 
-// Service Worker Registration for Offline First
+// Service Worker for 100% Offline Capability
 try {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+} catch (e) {}
+
+// URL Query Parameter Router for Presentation / Direct Screen Access
+try {
+  const params = new URLSearchParams(window.location.search);
+  const v = params.get("v") || (window.location.hash ? window.location.hash.slice(1) : null);
+  const demo = params.get("demo");
+  if (demo === "kavya" || (v && v !== "start")) {
+    fillKavya();
+    if (v && views[v]) S.view = v;
   }
 } catch (e) {}
 
