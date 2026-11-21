@@ -1,0 +1,551 @@
+{
+  "greeting": {
+    "en": "Hi, I'm Raasta. Let's find your path. Speak or tap, as you like.",
+    "ta": "வணக்கம்! நான் ராஸ்தா. உங்கள் வழியைக் கண்டுபிடிப்போம். பேசலாம் அல்லது தொடலாம்."
+  },
+  "questions": [
+    {
+      "key": "interests",
+      "ask": {
+        "en": "What do you enjoy doing or are good at?",
+        "ta": "உங்களுக்கு என்ன செய்யப் பிடிக்கும்?"
+      },
+      "reask": {
+        "en": "Something you do at home or for friends. Like stitching, or fixing phones.",
+        "ta": "வீட்டில் அல்லது நண்பர்களுக்காக நீங்கள் செய்வது. தையல், போன் பழுது போல."
+      },
+      "confirm": {
+        "en": "Lovely! That is a real skill.",
+        "ta": "அருமை! அது ஒரு உண்மையான திறமை."
+      },
+      "options": [
+        {
+          "v": "stitching",
+          "en": "Stitching",
+          "ta": "தையல்",
+          "kw": [
+            "stitch",
+            "sew",
+            "tailor",
+            "dress",
+            "தை",
+            "தையல்"
+          ]
+        },
+        {
+          "v": "phone_repair",
+          "en": "Phone repair",
+          "ta": "போன் பழுது",
+          "kw": [
+            "phone",
+            "mobile",
+            "repair",
+            "போன்",
+            "மொபைல்",
+            "பழுது"
+          ]
+        },
+        {
+          "v": "drawing",
+          "en": "Drawing",
+          "ta": "வரைதல்",
+          "kw": [
+            "draw",
+            "paint",
+            "art",
+            "வரை",
+            "ஓவியம்"
+          ]
+        },
+        {
+          "v": "computers",
+          "en": "Computers",
+          "ta": "கணினி",
+          "kw": [
+            "computer",
+            "laptop",
+            "coding",
+            "கணினி",
+            "கம்ப்யூட்டர்"
+          ]
+        },
+        {
+          "v": "farming",
+          "en": "Farming",
+          "ta": "விவசாயம்",
+          "kw": [
+            "farm",
+            "crop",
+            "field",
+            "விவசா",
+            "வயல்"
+          ]
+        },
+        {
+          "v": "cooking",
+          "en": "Cooking",
+          "ta": "சமையல்",
+          "kw": [
+            "cook",
+            "food",
+            "kitchen",
+            "சமை"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "age",
+      "ask": {
+        "en": "How old are you?",
+        "ta": "உங்கள் வயது என்ன?"
+      },
+      "reask": {
+        "en": "Just tell me your age in years.",
+        "ta": "உங்கள் வயதை ஆண்டுகளில் சொல்லுங்கள்."
+      },
+      "confirm": {
+        "en": "Got it!",
+        "ta": "சரி, புரிந்தது!"
+      },
+      "options": [
+        {
+          "v": 15,
+          "en": "15",
+          "ta": "15",
+          "kw": [
+            "15"
+          ]
+        },
+        {
+          "v": 16,
+          "en": "16",
+          "ta": "16",
+          "kw": [
+            "16"
+          ]
+        },
+        {
+          "v": 17,
+          "en": "17",
+          "ta": "17",
+          "kw": [
+            "17"
+          ]
+        },
+        {
+          "v": 18,
+          "en": "18",
+          "ta": "18",
+          "kw": [
+            "18"
+          ]
+        },
+        {
+          "v": 19,
+          "en": "19",
+          "ta": "19",
+          "kw": [
+            "19"
+          ]
+        },
+        {
+          "v": 21,
+          "en": "20+",
+          "ta": "20+",
+          "kw": [
+            "21"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "education",
+      "ask": {
+        "en": "Which class are you in?",
+        "ta": "நீங்கள் எந்த வகுப்பில் படிக்கிறீர்கள்?"
+      },
+      "reask": {
+        "en": "Are you in school or college, or did you stop studying?",
+        "ta": "பள்ளியிலா, கல்லூரியிலா, அல்லது படிப்பை நிறுத்திவிட்டீர்களா?"
+      },
+      "confirm": {
+        "en": "Thank you, that helps.",
+        "ta": "நன்றி, இது உதவும்."
+      },
+      "options": [
+        {
+          "v": "c9_10",
+          "en": "Class 9-10",
+          "ta": "9-10 வகுப்பு",
+          "kw": [
+            "9",
+            "10",
+            "nine",
+            "ten",
+            "ஒன்பது",
+            "பத்தாம்"
+          ]
+        },
+        {
+          "v": "c11_12",
+          "en": "Class 11-12",
+          "ta": "11-12 வகுப்பு",
+          "kw": [
+            "11",
+            "12",
+            "eleven",
+            "twelve",
+            "பதினொன்று",
+            "பன்னிரண்டு"
+          ]
+        },
+        {
+          "v": "passed12",
+          "en": "Passed 12",
+          "ta": "12 முடித்தேன்",
+          "kw": [
+            "passed",
+            "finished",
+            "completed",
+            "முடித்"
+          ]
+        },
+        {
+          "v": "iti_diploma",
+          "en": "ITI / Diploma",
+          "ta": "ஐடிஐ / டிப்ளோமா",
+          "kw": [
+            "iti",
+            "diploma",
+            "polytechnic",
+            "ஐடிஐ",
+            "டிப்ளோமா"
+          ]
+        },
+        {
+          "v": "ug",
+          "en": "College",
+          "ta": "கல்லூரி",
+          "kw": [
+            "college",
+            "degree",
+            "கல்லூரி",
+            "டிகிரி"
+          ]
+        },
+        {
+          "v": "dropout",
+          "en": "Left school",
+          "ta": "படிப்பை நிறுத்தினேன்",
+          "kw": [
+            "left school",
+            "stopped",
+            "dropped",
+            "நிறுத்தி",
+            "நிறுத்தினேன்"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "gender",
+      "ask": {
+        "en": "Are you a girl or a boy?",
+        "ta": "நீங்கள் பெண்ணா ஆணா?"
+      },
+      "reask": {
+        "en": "Please tap girl, boy or other.",
+        "ta": "பெண், ஆண் அல்லது மற்றவை என்பதைத் தொடவும்."
+      },
+      "confirm": {
+        "en": "Thank you!",
+        "ta": "நன்றி!"
+      },
+      "options": [
+        {
+          "v": "female",
+          "en": "Girl",
+          "ta": "பெண்",
+          "kw": [
+            "girl",
+            "female",
+            "lady",
+            "பெண்"
+          ]
+        },
+        {
+          "v": "male",
+          "en": "Boy",
+          "ta": "ஆண்",
+          "kw": [
+            "boy",
+            "guy",
+            "ஆண்"
+          ]
+        },
+        {
+          "v": "other",
+          "en": "Other",
+          "ta": "மற்றவை",
+          "kw": [
+            "other",
+            "மற்றவை"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "govt_school",
+      "ask": {
+        "en": "Did you study in a government school?",
+        "ta": "அரசுப் பள்ளியில் படித்தீர்களா?"
+      },
+      "reask": {
+        "en": "Was your school run by the government? Yes or no.",
+        "ta": "உங்கள் பள்ளி அரசுப் பள்ளியா? ஆம் அல்லது இல்லை."
+      },
+      "confirm": {
+        "en": "Okay, noted.",
+        "ta": "சரி, குறித்துக்கொண்டேன்."
+      },
+      "options": [
+        {
+          "v": true,
+          "en": "Yes",
+          "ta": "ஆம்",
+          "kw": [
+            "yes",
+            "ஆம்",
+            "ஆமா"
+          ]
+        },
+        {
+          "v": false,
+          "en": "No",
+          "ta": "இல்லை",
+          "kw": [
+            "no",
+            "இல்லை"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "category",
+      "ask": {
+        "en": "Your community category?",
+        "ta": "உங்கள் சமூகப் பிரிவு?"
+      },
+      "reask": {
+        "en": "This helps find the right schemes. Tap the one that fits.",
+        "ta": "சரியான திட்டங்களைக் கண்டுபிடிக்க இது உதவும். பொருத்தமானதைத் தொடவும்."
+      },
+      "confirm": {
+        "en": "Thank you for telling me.",
+        "ta": "சொன்னதற்கு நன்றி."
+      },
+      "options": [
+        {
+          "v": "general",
+          "en": "General",
+          "ta": "பொது",
+          "kw": [
+            "general",
+            "open category",
+            "பொது"
+          ]
+        },
+        {
+          "v": "obc",
+          "en": "BC / OBC",
+          "ta": "பிசி / ஓபிசி",
+          "kw": [
+            "obc",
+            "backward",
+            "bc ",
+            "பிசி",
+            "ஓபிசி",
+            "பிற்படுத்தப்பட்ட"
+          ]
+        },
+        {
+          "v": "sc",
+          "en": "SC",
+          "ta": "எஸ்சி",
+          "kw": [
+            "scheduled caste",
+            "sc category",
+            "s c",
+            "எஸ்சி",
+            "ஆதிதிராவிட"
+          ]
+        },
+        {
+          "v": "st",
+          "en": "ST",
+          "ta": "எஸ்டி",
+          "kw": [
+            "scheduled tribe",
+            "st category",
+            "s t",
+            "எஸ்டி",
+            "பழங்குடி"
+          ]
+        },
+        {
+          "v": "minority",
+          "en": "Minority",
+          "ta": "சிறுபான்மை",
+          "kw": [
+            "minority",
+            "சிறுபான்மை"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "family_income_lakh",
+      "ask": {
+        "en": "About how much does your family earn in a year?",
+        "ta": "உங்கள் குடும்பம் ஆண்டுக்கு எவ்வளவு சம்பாதிக்கிறது?"
+      },
+      "reask": {
+        "en": "Roughly, all the family's earnings in one year. Tap the closest.",
+        "ta": "குடும்பத்தின் மொத்த ஆண்டு வருமானம், தோராயமாக. நெருக்கமானதைத் தொடவும்."
+      },
+      "confirm": {
+        "en": "Thanks, that really helps.",
+        "ta": "நன்றி, இது மிகவும் உதவும்."
+      },
+      "options": [
+        {
+          "v": 0.8,
+          "en": "Below ₹1 lakh",
+          "ta": "₹1 லட்சத்திற்குள்",
+          "kw": [
+            "below one",
+            "less than one"
+          ]
+        },
+        {
+          "v": 2,
+          "en": "₹1-2.5 lakh",
+          "ta": "₹1-2.5 லட்சம்",
+          "kw": [
+            "two",
+            "2"
+          ]
+        },
+        {
+          "v": 3.5,
+          "en": "₹2.5-4.5 lakh",
+          "ta": "₹2.5-4.5 லட்சம்",
+          "kw": [
+            "three",
+            "four",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "v": 6,
+          "en": "Above ₹4.5 lakh",
+          "ta": "₹4.5 லட்சத்திற்கு மேல்",
+          "kw": [
+            "five",
+            "six",
+            "above"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "marks_percent",
+      "ask": {
+        "en": "Your marks in the last exam?",
+        "ta": "கடைசித் தேர்வில் மதிப்பெண்?"
+      },
+      "reask": {
+        "en": "Roughly is fine. Tap the nearest range.",
+        "ta": "தோராயமாக போதும். நெருக்கமான அளவைத் தொடவும்."
+      },
+      "confirm": {
+        "en": "Almost done!",
+        "ta": "கிட்டத்தட்ட முடிந்தது!"
+      },
+      "options": [
+        {
+          "v": 45,
+          "en": "Below 50%",
+          "ta": "50%க்கு கீழ்",
+          "kw": [
+            "below 50",
+            "less"
+          ]
+        },
+        {
+          "v": 65,
+          "en": "50-75%",
+          "ta": "50-75%",
+          "kw": [
+            "60",
+            "70",
+            "sixty",
+            "seventy"
+          ]
+        },
+        {
+          "v": 82,
+          "en": "75-90%",
+          "ta": "75-90%",
+          "kw": [
+            "80",
+            "eighty",
+            "85"
+          ]
+        },
+        {
+          "v": 93,
+          "en": "Above 90%",
+          "ta": "90%க்கு மேல்",
+          "kw": [
+            "90",
+            "ninety",
+            "95"
+          ]
+        }
+      ]
+    }
+  ],
+  "encouragement": {
+    "en": "You're doing great. Just a few more questions.",
+    "ta": "நன்றாகச் செய்கிறீர்கள். இன்னும் சில கேள்விகள்தான்."
+  },
+  "not_understood": {
+    "en": "Sorry, I didn't catch that. Please tap one below.",
+    "ta": "மன்னிக்கவும், புரியவில்லை. கீழே ஒன்றைத் தொடவும்."
+  },
+  "offline": {
+    "en": "You're offline. You can still tap your answers.",
+    "ta": "இணையம் இல்லை. நீங்கள் தொட்டுப் பதிலளிக்கலாம்."
+  },
+  "closing": {
+    "en": "Thank you! Your answers are saved. Let's see your routes.",
+    "ta": "நன்றி! உங்கள் பதில்கள் சேமிக்கப்பட்டன. உங்கள் வழிகளைப் பார்க்கலாம்."
+  },
+  "extras": {
+    "listening": {
+      "en": "I'm listening.",
+      "ta": "கேட்கிறேன்."
+    },
+    "thinking": {
+      "en": "One moment.",
+      "ta": "ஒரு நிமிடம்."
+    },
+    "mic_denied": {
+      "en": "I can't use the mic. Please tap your answers instead.",
+      "ta": "மைக் கிடைக்கவில்லை. தொட்டுப் பதிலளிக்கவும்."
+    }
+  }
+}
