@@ -11,7 +11,8 @@ const S = {
     try { return JSON.parse(localStorage.getItem("raasta_rec") || "{}"); } catch { return {}; }
   })(),
   view: "start",
-  isListening: false
+  isListening: false,
+  facilitatorFilter: "all"
 };
 
 const $ = sel => document.querySelector(sel);
@@ -141,20 +142,22 @@ function fillKavya() {
 const chipLabels = () => QUESTIONS.filter(q => S.profile[q.key] !== undefined).map(q => {
   const v = S.profile[q.key];
   const o = q.options.find(opt => (Array.isArray(v) ? v.includes(opt.v) : opt.v === v));
-  return o ? `${o.icon} ${L(o)}` : "";
+  return o ? { key: q.key, label: `${o.icon} ${L(o)}`, raw: o } : null;
 }).filter(Boolean);
 
 const renderGenomeChips = () => {
-  const labels = chipLabels();
-  if (!labels.length) return "";
+  const items = chipLabels();
+  if (!items.length) return "";
   return `
     <div class="genome-container">
       <div class="genome-header">
         <span>🧬 ${S.lang === "ta" ? "உங்கள் திறன் வரைபடம் (Skill Genome)" : "Skill Genome"}</span>
-        <span>${labels.length} / ${QUESTIONS.length}</span>
+        <button class="btn sm ghost" data-act="go" data-v="profile" style="padding: 2px 8px; font-size:11px; width:auto;">
+          ✏️ ${S.lang === "ta" ? "விவரம் / Edit" : "Edit"}
+        </button>
       </div>
       <div class="chips">
-        ${labels.map(c => `<span class="chip">${esc(c)}</span>`).join("")}
+        ${items.map(item => `<span class="chip" data-act="go" data-v="profile" style="cursor:pointer;" title="Tap to view profile">${esc(item.label)}</span>`).join("")}
       </div>
     </div>`;
 };
@@ -175,7 +178,7 @@ function parentScriptText() {
 const views = {
   // --- 1. Welcome & Language Picker ---
   start: () => `
-    <div class="card" style="text-align:center; padding: 24px 16px;">
+    <div class="card" style="text-align:center; padding: 26px 16px;">
       <div style="font-size: 56px; margin-bottom: 8px;">🧭</div>
       <h1>Raasta · ராஸ்தா</h1>
       <p class="muted" style="font-size: 15px; margin: 8px 0 16px;">
@@ -210,7 +213,7 @@ const views = {
     const progress = Math.min(100, Math.round((S.step / QUESTIONS.length) * 100));
 
     return `
-      <!-- Progress Bar -->
+      <!-- Progress Indicator -->
       <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:600; color:var(--ink-secondary);">
         <span>${S.lang === "ta" ? "சுயவிவரப் பதிவு" : "Building Skill Genome"}</span>
         <span>${S.step} / ${QUESTIONS.length} (${progress}%)</span>
@@ -232,7 +235,7 @@ const views = {
       <!-- Collected Genome Chips -->
       ${renderGenomeChips()}
 
-      <!-- Question Answer Options (if question active) -->
+      <!-- Question Answer Options -->
       ${q ? `
         <div style="margin-top: 4px;">
           <div style="font-size: 13.5px; font-weight: 600; color: var(--ink-secondary); margin-bottom: 8px;">
@@ -257,7 +260,7 @@ const views = {
             <div class="text-input-wrap">
               <input type="text" id="typed" placeholder="${S.lang === 'ta' ? 'அல்லது இங்கே எழுதவும்...' : 'or type your answer...'}">
               <div id="micStatus" style="font-size: 11px; color: var(--ink-tertiary); margin-top: 4px;">
-                ${S.lang === "ta" ? "பேச மைக் பட்டனைத் தொடவும்" : "Tap mic to speak"}
+                <span class="mic-hint-chip">🎙️ ${S.lang === "ta" ? "பேச மைக் தொடவும்" : "Tap mic to speak"}</span>
               </div>
             </div>
           </div>
@@ -432,9 +435,9 @@ const views = {
     `;
   },
 
-  // --- 6. Facilitator Mode (Teacher Dashboard) ---
+  // --- 6. Facilitator Mode (Teacher Dashboard with Filter Tabs) ---
   facilitator: () => {
-    const rows = STUDENTS.map(s => {
+    let rows = STUDENTS.map(s => {
       const isDemoKavya = s.name === "Kavya" && isProfileComplete();
       const currentProfile = isDemoKavya ? S.profile : s;
       return {
@@ -443,9 +446,16 @@ const views = {
         name: s.name,
         top: matchCareers(currentProfile)[0],
         eligibleCount: eligibility(currentProfile).filter(e => e.status === "eligible").length,
-        flag: talentFlag(currentProfile)
+        flag: talentFlag(currentProfile),
+        isRecommended: !!S.recommended[s.student_id]
       };
     });
+
+    if (S.facilitatorFilter === "flagged") {
+      rows = rows.filter(r => r.flag);
+    } else if (S.facilitatorFilter === "rec") {
+      rows = rows.filter(r => r.isRecommended);
+    }
 
     return `
       <div>
@@ -453,14 +463,15 @@ const views = {
         <p class="muted">Govt Higher Secondary School, Villupuram · 60+ Students Cohort</p>
       </div>
 
+      <!-- Cohort Summary Metrics -->
       <div class="card" style="padding:12px; display:flex; justify-content:space-around; text-align:center;">
         <div>
-          <div style="font-size:22px; font-weight:700; color:var(--brand-primary);">${rows.length}</div>
+          <div style="font-size:22px; font-weight:700; color:var(--brand-primary);">${STUDENTS.length}</div>
           <div class="muted" style="font-size:12px;">Active Students</div>
         </div>
         <div style="border-right:1px solid var(--border-subtle);"></div>
         <div>
-          <div style="font-size:22px; font-weight:700; color:var(--accent-gold);">${rows.filter(r => r.flag).length}</div>
+          <div style="font-size:22px; font-weight:700; color:var(--accent-gold);">${STUDENTS.filter(s => talentFlag(s)).length}</div>
           <div class="muted" style="font-size:12px;">⭐ Talent Flags</div>
         </div>
         <div style="border-right:1px solid var(--border-subtle);"></div>
@@ -470,6 +481,20 @@ const views = {
         </div>
       </div>
 
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <button class="filter-pill ${S.facilitatorFilter === 'all' ? 'active' : ''}" data-act="filter-fac" data-v="all">
+          All (${STUDENTS.length})
+        </button>
+        <button class="filter-pill ${S.facilitatorFilter === 'flagged' ? 'active' : ''}" data-act="filter-fac" data-v="flagged">
+          ⭐ Talent Flagged (${STUDENTS.filter(s => talentFlag(s)).length})
+        </button>
+        <button class="filter-pill ${S.facilitatorFilter === 'rec' ? 'active' : ''}" data-act="filter-fac" data-v="rec">
+          ✅ Recommended (${Object.keys(S.recommended).length})
+        </button>
+      </div>
+
+      <!-- Table View -->
       <div class="card" style="padding: 10px; overflow-x: auto;">
         <table class="students-table">
           <thead>
@@ -481,7 +506,7 @@ const views = {
             </tr>
           </thead>
           <tbody>
-            ${rows.map(({ s, student_id, name, top, eligibleCount, flag }) => `
+            ${rows.map(({ s, student_id, name, top, eligibleCount, flag, isRecommended }) => `
               <tr>
                 <td>
                   <b>${esc(name)}</b>
@@ -491,7 +516,7 @@ const views = {
                 <td style="font-size:12.5px;">${top ? esc(top.title.en) : "-"}</td>
                 <td style="font-weight:700; color:var(--brand-primary);">${eligibleCount}</td>
                 <td>
-                  ${S.recommended[student_id] 
+                  ${isRecommended 
                     ? `<span style="color:var(--status-eligible-ink); font-weight:700; font-size:12px;">✅ Sent</span>` 
                     : `<button class="btn sm" data-act="rec" data-v="${student_id}" style="padding:4px 8px; font-size:12px;">Recommend</button>`}
                 </td>
@@ -503,6 +528,74 @@ const views = {
       <p class="muted" style="font-size: 12px; margin-top: 4px;">
         ⭐ = AI Talent Flag (Marks $\ge$80% or multiple practical skills). The teacher verifies and endorses.
       </p>
+    `;
+  },
+
+  // --- 7. Profile / "About Me" (Editable Chips) ---
+  profile: () => {
+    const isDone = isProfileComplete();
+    const name = S.profile.name || (S.lang === "ta" ? "காவ்யா" : "Kavya");
+    const flag = talentFlag(S.profile);
+
+    return `
+      <div>
+        <div class="row between">
+          <h1>👤 ${S.lang === "ta" ? "மாணவர் சுயவிவரம்" : "About Me · Skill Genome"}</h1>
+          <button class="btn sm ghost" data-act="go" data-v="talk" style="width:auto;">← ${S.lang === 'ta' ? 'உரையாடல்' : 'Chat'}</button>
+        </div>
+        <p class="muted">
+          ${S.lang === "ta" 
+            ? "உங்கள் பதில்களின் அடிப்படையில் சேகரிக்கப்பட்ட தகவல்கள். மாற்ற விரும்பினால் தட்டவும்." 
+            : "Your verified Skill Genome. Tap any item to adjust."}
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="row between" style="margin-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 20px;">${esc(name)} ${flag ? `<span class="talent-star">⭐</span>` : ""}</h2>
+            <div class="muted">Villupuram, Tamil Nadu</div>
+          </div>
+          <span class="status-pill ${isDone ? 'eligible' : 'maybe'}">
+            ${isDone ? (S.lang === "ta" ? "நிறைவுற்றது" : "Verified") : (S.lang === "ta" ? "பதிவில்..." : "In progress")}
+          </span>
+        </div>
+
+        <div style="font-size: 13.5px;">
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "ஆர்வங்கள் & திறன்கள்" : "Interests & Skills"}</span>
+            <b>${(S.profile.interests || []).map(i => `🧵 ${i}`).join(", ") || "-"}</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "வயது" : "Age"}</span>
+            <b>${S.profile.age || "-"}</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "படிப்பு" : "Education"}</span>
+            <b>${S.profile.education || "Class 11-12"}</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "பள்ளி வகை" : "School"}</span>
+            <b>${S.profile.govt_school ? (S.lang === "ta" ? "அரசுப் பள்ளி" : "Govt School") : "Private"}</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "சமூகப் பிரிவு" : "Category"}</span>
+            <b>${(S.profile.category || "OBC").toUpperCase()}</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "குடும்ப வருமானம்" : "Income"}</span>
+            <b>₹${S.profile.family_income_lakh || 2.0} Lakh/year</b>
+          </div>
+          <div class="profile-row">
+            <span class="muted">${S.lang === "ta" ? "மதிப்பெண்" : "Marks"}</span>
+            <b>${S.profile.marks_percent || 82}%</b>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn gold" data-act="go" data-v="careers">
+        🧭 ${S.lang === "ta" ? "தொழில் வழிகளைப் பார்க்கவும்" : "View Matched Routes"} →
+      </button>
     `;
   }
 };
@@ -517,9 +610,13 @@ function render() {
   const nav = $("#nav");
   if (nav) nav.style.display = S.lang ? "grid" : "none";
   
+  const profileHeaderBtn = $("#profileHeaderBtn");
+  if (profileHeaderBtn) {
+    profileHeaderBtn.style.display = S.lang && isProfileComplete() ? "inline-flex" : "none";
+  }
+
   document.querySelectorAll("nav button").forEach(b => {
     b.classList.toggle("on", b.dataset.v === currentView);
-    // Allow navigation if profile is complete or for facilitator mode
     b.disabled = b.dataset.v !== "talk" && b.dataset.v !== "facilitator" && !isProfileComplete();
   });
 
@@ -605,6 +702,10 @@ document.addEventListener("click", e => {
   else if (action === "read") {
     const textToRead = target.dataset.t;
     if (textToRead) Voice.speak(textToRead, S.lang || "ta");
+  }
+  else if (action === "filter-fac") {
+    S.facilitatorFilter = target.dataset.v;
+    render();
   }
 });
 

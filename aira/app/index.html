@@ -139,7 +139,6 @@
     justify-content: center;
   }
 
-  /* Centered phone wrapper for laptop screen share demo + mobile view */
   .phone-shell {
     width: 100%;
     max-width: 420px;
@@ -207,6 +206,19 @@
     color: #111C18;
   }
 
+  .header-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #FFFFFF;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .theme-toggle-btn {
     background: none;
     border: none;
@@ -227,7 +239,7 @@
     flex-direction: column;
     gap: 14px;
     overflow-y: auto;
-    padding-bottom: 84px; /* Space for bottom nav */
+    padding-bottom: 84px;
   }
 
   /* Bottom Navigation */
@@ -329,22 +341,15 @@
     transition: transform 0.1s ease, background-color 0.15s ease;
   }
 
-  .btn:active {
-    transform: scale(0.98);
-  }
-
-  .btn:hover {
-    background: var(--brand-hover);
-  }
+  .btn:active { transform: scale(0.98); }
+  .btn:hover { background: var(--brand-hover); }
 
   .btn.ghost {
     background: var(--brand-surface);
     color: var(--brand-primary);
   }
 
-  .btn.ghost:hover {
-    background: var(--border-subtle);
-  }
+  .btn.ghost:hover { background: var(--border-subtle); }
 
   .btn.gold {
     background: var(--accent-gold);
@@ -352,9 +357,7 @@
     font-weight: 700;
   }
 
-  .btn.gold:hover {
-    background: var(--accent-gold-hover);
-  }
+  .btn.gold:hover { background: var(--accent-gold-hover); }
 
   .btn.sm {
     padding: 8px 12px;
@@ -366,18 +369,9 @@
   .row { display: flex; gap: 8px; }
   .between { justify-content: space-between; align-items: center; }
 
-  /* Grid of Options for Touch */
-  .grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
+  /* Option Buttons Grid */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
   .opt-btn {
     border: 1.5px solid var(--border-subtle);
@@ -397,20 +391,14 @@
     transition: all 0.15s ease;
   }
 
-  .opt-btn .icon {
-    font-size: 26px;
-  }
-
+  .opt-btn .icon { font-size: 26px; }
   .opt-btn:hover, .opt-btn:focus-visible {
     border-color: var(--brand-primary);
     background: var(--brand-surface);
   }
+  .opt-btn:active { transform: scale(0.97); }
 
-  .opt-btn:active {
-    transform: scale(0.97);
-  }
-
-  /* Chat Bubbles */
+  /* Chat Feed */
   .chat-feed {
     display: flex;
     flex-direction: column;
@@ -455,7 +443,7 @@
     vertical-align: middle;
   }
 
-  /* Dynamic Skill Genome Chips */
+  /* Genome Drawer */
   .genome-container {
     background: var(--bg-card-subtle);
     border: 1px dashed var(--border-strong);
@@ -473,12 +461,7 @@
     margin-bottom: 6px;
   }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
     background: var(--brand-surface);
     color: var(--brand-primary);
@@ -498,12 +481,13 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
-  /* Mic Action Button & Voice Bar */
+  /* Voice Controls & Tooltip */
   .voice-controls {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-top: 4px;
+    position: relative;
   }
 
   .mic-btn {
@@ -531,9 +515,7 @@
     fill: none;
   }
 
-  .mic-btn:hover {
-    background: var(--brand-hover);
-  }
+  .mic-btn:hover { background: var(--brand-hover); }
 
   .mic-btn.listening {
     background: #DC2626;
@@ -546,11 +528,17 @@
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
   }
 
-  .text-input-wrap {
-    flex: 1;
-    position: relative;
+  .mic-hint-chip {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-primary);
+    background: var(--brand-surface);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    display: inline-block;
   }
 
+  .text-input-wrap { flex: 1; position: relative; }
   .text-input-wrap input {
     width: 100%;
     border: 1.5px solid var(--border-subtle);
@@ -562,11 +550,9 @@
     outline: none;
   }
 
-  .text-input-wrap input:focus {
-    border-color: var(--brand-primary);
-  }
+  .text-input-wrap input:focus { border-color: var(--brand-primary); }
 
-  /* Career Tags & Cards */
+  /* Career Cards */
   .career-card {
     background: var(--bg-card);
     border: 1.5px solid var(--border-subtle);
@@ -579,9 +565,7 @@
     transition: border-color 0.15s ease;
   }
 
-  .career-card:hover {
-    border-color: var(--brand-primary);
-  }
+  .career-card:hover { border-color: var(--brand-primary); }
 
   .tag-badge {
     font-size: 11px;
@@ -679,11 +663,9 @@
     margin-top: 4px;
   }
 
-  .official-link:hover {
-    text-decoration: underline;
-  }
+  .official-link:hover { text-decoration: underline; }
 
-  /* Vertical Pathway Timeline (Raasta Metaphor) */
+  /* Vertical Timeline */
   .pathway-timeline {
     position: relative;
     padding-left: 28px;
@@ -703,10 +685,7 @@
     background: repeating-linear-gradient(to bottom, var(--brand-primary) 0, var(--brand-primary) 6px, transparent 6px, transparent 10px);
   }
 
-  .timeline-step {
-    position: relative;
-  }
-
+  .timeline-step { position: relative; }
   .timeline-step::before {
     content: '';
     position: absolute;
@@ -755,7 +734,33 @@
     border: 1px solid rgba(217, 119, 6, 0.3);
   }
 
-  /* Facilitator Mode Table */
+  /* Facilitator Mode Table & Filter Tabs */
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+
+  .filter-pill {
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+    color: var(--ink-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .filter-pill.active {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+    border-color: var(--brand-primary);
+  }
+
   table.students-table {
     width: 100%;
     border-collapse: collapse;
@@ -782,7 +787,18 @@
     margin-left: 2px;
   }
 
-  /* Demo fail-safe banner */
+  /* Editable Profile Screen */
+  .profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .profile-row:last-child { border-bottom: none; }
+
+  /* Demo fail-safe */
   .demo-cue {
     background: var(--bg-card-subtle);
     border: 1px dashed var(--border-strong);
@@ -818,6 +834,7 @@
       <span class="net-badge" id="net">
         <span style="font-size:9px">●</span> <span id="netText">online</span>
       </span>
+      <button class="header-btn" id="profileHeaderBtn" title="About Me / சுயவிவரம்" data-act="go" data-v="profile" style="display:none;">👤 சுயவிவரம்</button>
       <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark/Light Mode">🌓</button>
     </div>
   </header>
