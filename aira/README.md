@@ -4,7 +4,7 @@
 Design and build the **full UI/UX** of Raasta: professional, minimal, warm, and usable by low-literacy students on cheap Android phones. Tamil first.
 
 ## Start
-1. Copy `shared/prototype/*` into `aira/app/`.
+1. Build the UI **fresh** in `aira/app/` (don't reuse the old prototype's look). Copy only `engine.js` and `data.js` from `shared/prototype/` (the logic).
 2. Follow the full design brief: `UI_UX_BRIEF.md` (in this folder).
 
 ## Screens

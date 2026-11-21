@@ -1,0 +1,10 @@
+{
+  "name": "Raasta · ராஸ்தா",
+  "short_name": "Raasta",
+  "description": "Google Maps for Careers for Rural India",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8F9F7",
+  "theme_color": "#0D5C46",
+  "icons": []
+}

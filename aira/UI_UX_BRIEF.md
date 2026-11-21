@@ -1,10 +1,10 @@
 # UI/UX Brief: Raasta (paste this into Antigravity as your first prompt)
 
-You are the lead product designer and frontend engineer for **Raasta**, our Round 2 entry in the Citi India Hackathon (Ada Lovelace Day). I own the **entire UI/UX**. Your job is to **think like a senior designer first, then build**. Don't just restyle what exists: question it, research good patterns, and propose the best **professional, minimal, warm** experience for our users, then implement it.
+You are the lead product designer and frontend engineer for **Raasta**, our Round 2 entry in the Citi India Hackathon (Ada Lovelace Day). I own the **entire UI/UX**. Your job is to **think like a senior designer first, then build**. **Design the UI completely fresh. I did NOT like the old prototype's look, so don't reuse its HTML, CSS or layout at all.** Research good patterns and propose the best **professional, minimal, warm** experience for our users, then implement it.
 
 Read these files in this folder before doing anything:
 - `../HANDOFF_FULL_CONTEXT.md` (local only, not in the repo): the full project context (problem, features, scope, team, deadlines)
-- `shared/prototype/`: the current working prototype (read-only baseline; copy it into `aira/app/`) (`index.html`, `app.js`, `engine.js`, `data.js`, `sw.js`)
+- `shared/prototype/`: the current working prototype (read-only; use it ONLY to understand the flow and to reuse the LOGIC: copy `engine.js` and `data.js` (and the Web Speech `listen`/`speak` code) into `aira/app/`. Ignore its `index.html` styling and `app.js` UI code; build the UI from scratch) (`index.html`, `app.js`, `engine.js`, `data.js`, `sw.js`)
 - `README.md` (team folders, contracts) and `aira/README.md` (my task)
 - **Work ONLY inside `aira/`.** Never edit other people's folders or `shared/`.
 
