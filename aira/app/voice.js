@@ -13,9 +13,27 @@
   } catch (e) {}
   const pref = () => { try { return localStorage.getItem(PREF_KEY) || 'sarvam'; } catch (e) { return 'sarvam'; } };
 
+  // Credit guard: each device gets a daily allowance of Sarvam audio (listening + speaking).
+  // Default 5 minutes. Change for this device with ?voiceminutes=2 (or any number) once.
+  // When it runs out, the app quietly switches to the browser's own voice until tomorrow.
+  const BUDGET_KEY = 'raasta_sarvam_budget', USED_KEY = 'raasta_sarvam_used';
+  try {
+    const m = parseFloat(new URLSearchParams(location.search).get('voiceminutes'));
+    if (m > 0 && m <= 30) localStorage.setItem(BUDGET_KEY, String(m));
+  } catch (e) {}
+  const today = () => new Date().toISOString().slice(0, 10);
+  const budgetSec = () => { try { return (parseFloat(localStorage.getItem(BUDGET_KEY)) || 5) * 60; } catch (e) { return 300; } };
+  function usedSec() {
+    try { const u = JSON.parse(localStorage.getItem(USED_KEY) || '{}'); return u.day === today() ? u.sec || 0 : 0; } catch (e) { return 0; }
+  }
+  function addUsage(sec) {
+    try { localStorage.setItem(USED_KEY, JSON.stringify({ day: today(), sec: Math.round((usedSec() + sec) * 10) / 10 })); } catch (e) {}
+  }
+  const withinBudget = () => usedSec() < budgetSec();
+
   let statusPromise = null;
   function sarvamReady() {
-    if (pref() === 'browser' || !navigator.onLine) return Promise.resolve(false);
+    if (pref() === 'browser' || !navigator.onLine || !withinBudget()) return Promise.resolve(false);
     if (!statusPromise) {
       statusPromise = fetch('api/voice-status', { cache: 'no-store' })
         .then(r => (r.ok ? r.json() : { sarvam: false }))
@@ -76,6 +94,7 @@
           b64 = (await r.json()).audio;
           if (!b64) throw new Error('tts empty');
           ttsCache.set(key, b64);
+          addUsage(Math.max(0.5, (b64.length * 0.75 - 44) / (22050 * 2))); // WAV, 22.05 kHz mono 16-bit
         }
         return playB64(b64);
       } catch (e) { /* fall through to the browser voice */ }
@@ -127,7 +146,9 @@
   }
 
   async function sarvamListen(locale) {
+    const t0 = Date.now();
     const blob = await recordUntilSilence(9000);
+    addUsage((Date.now() - t0) / 1000);
     if (!blob.size) return { text: '' };
     const r = await fetch('api/stt?lang=' + encodeURIComponent(locale), {
       method: 'POST',
@@ -172,6 +193,7 @@
 
   window.RaastaVoice = {
     listen, speak, stop: stopAll,
-    engine: async () => ((await sarvamReady()) ? 'sarvam' : 'browser')
+    engine: async () => ((await sarvamReady()) ? 'sarvam' : 'browser'),
+    usage: () => ({ usedSeconds: usedSec(), limitSeconds: budgetSec() })
   };
 })();
