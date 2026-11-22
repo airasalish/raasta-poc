@@ -18,3 +18,11 @@
 @media(prefers-reduced-motion:no-preference){.intro-sheet{animation:sheet-in .22s ease-out}@keyframes sheet-in{from{transform:translateY(18px);opacity:.4}to{transform:none;opacity:1}}}
 @media(max-width:360px){.intro-sheet{left:8px;right:8px;bottom:8px;padding:16px 14px 12px}.intro-art{height:170px}.intro-sheet h2{font-size:21px}.intro-row{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.intro-sheet{animation:none}}
+/* Adaptive conversation */
+.genome{margin:4px 0 2px}.genome-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.genome-chip{background:#e3efe6;color:#123d2c;border:1px solid #b9ccb9;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}
+.message.thinking{opacity:.6;letter-spacing:3px}
+.sugg-row{display:flex;flex-wrap:wrap;gap:8px}.sugg-chip{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid #9eafa1;background:#fff;color:#123d2c;font:inherit;font-size:15px;cursor:pointer}
+.mic-hero{width:100%;min-height:64px;font-size:17px;justify-content:center;gap:12px}
+.ai-form{display:flex;gap:8px}.ai-form input{flex:1;min-width:0;min-height:48px;border:1px solid #9eafa1;border-radius:12px;padding:0 14px;font:inherit;font-size:16px;background:#fff;color:#10241b}
+.ai-form .primary-action{width:auto;padding:0 18px;min-height:48px}
