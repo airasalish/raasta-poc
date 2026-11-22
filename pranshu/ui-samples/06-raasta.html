@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta · combined</title>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="counselor.css">
+  <style>
+    .split { display: flex; gap: 28px; align-items: flex-start; justify-content: center; padding: 22px 16px 56px; }
+    .notes { width: 280px; background: #fffdf8; border: 2px solid #1c1915; border-radius: 18px; padding: 16px; }
+    .notes h2 { margin: 0 0 8px; font-size: 18px; }
+    .notes ol { margin: 0; padding-left: 18px; }
+    .notes li { margin: 0 0 10px; line-height: 1.4; }
+    .notes b { display: block; }
+    .phone { background: #fff6ea; }
+    .view { height: 100%; display: flex; flex-direction: column; padding: 4px 16px 12px; }
+    .greet { display: flex; align-items: center; gap: 10px; }
+    .greet h2 { margin: 0; font-size: 26px; letter-spacing: -0.03em; }
+    .greet p { margin: 2px 0 0; color: var(--muted); font-weight: 700; }
+    .miczone { flex: 1; display: grid; place-items: center; text-align: center; }
+    .bigmic {
+      width: 148px; height: 148px; border-radius: 50%; border: 4px solid #1c1915;
+      background: radial-gradient(circle at 35% 30%, #ffb07a, #e36a1e 62%);
+      box-shadow: 0 12px 0 #9a3d0e; color: #1c1915;
+      display: grid; place-items: center; padding: 0;
+    }
+    .bigmic svg { width: 62px; height: 62px; }
+    .miczone strong { display: block; margin-top: 16px; font-size: 28px; }
+    .miczone span { color: var(--muted); font-weight: 700; }
+    .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .chip {
+      background: white; border: 2px solid #1c1915; border-radius: 16px;
+      min-height: 84px; font-weight: 800; font-size: 15px;
+    }
+    .strip { display: flex; gap: 8px; overflow: auto; padding: 10px 0 4px; }
+    .mini {
+      flex: none; width: 168px; height: 96px; border-radius: 14px; border: 2px solid #1c1915;
+      font-weight: 800; text-align: left; padding: 10px;
+    }
+    .nav {
+      display: grid; grid-template-columns: 1fr 1.3fr 1fr 1fr;
+      gap: 4px; padding: 8px 10px 12px; background: #fffaf3; border-top: 2px solid #ead9c2;
+    }
+    .nav button {
+      border: 0; background: transparent; font-weight: 800; font-size: 13px; min-height: 56px; border-radius: 14px;
+    }
+    .nav button.on { background: #ffe1cc; }
+    .nav .talk { background: #e36a1e; border: 3px solid #1c1915; border-radius: 18px; }
+    .wave { display: flex; gap: 6px; height: 64px; align-items: flex-end; justify-content: center; margin: 12px 0; }
+    .wave i { width: 8px; background: #e36a1e; border-radius: 8px; height: 14px; display: block; animation: wv .8s ease-in-out infinite; }
+    .wave i:nth-child(2){animation-delay:.1s} .wave i:nth-child(3){animation-delay:.2s}
+    .wave i:nth-child(4){animation-delay:.3s} .wave i:nth-child(5){animation-delay:.15s}
+    @keyframes wv { 50% { height: 64px } }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pills span { background: #ffe1cc; border: 2px solid #1c1915; border-radius: 999px; padding: 8px 12px; font-weight: 800; }
+    .yes, .wide {
+      width: 100%; min-height: 68px; border-radius: 16px; border: 3px solid #1c1915;
+      background: #cfeedd; font-size: 20px; font-weight: 800; margin-top: 12px;
+    }
+    .yes:disabled { background: #eee; color: #999; border-color: #ccc; }
+    h3 { margin: 6px 0; font-size: 26px; letter-spacing: -0.03em; }
+    .path { list-style: none; margin: 0; padding: 0; position: relative; }
+    .path::before { content: ""; position: absolute; left: 28px; top: 8px; bottom: 8px; width: 10px; background: #f0c48a; border-radius: 99px; }
+    .stop {
+      position: relative; display: flex; align-items: center; gap: 12px;
+      width: 100%; text-align: left; background: white; border: 3px solid #1c1915;
+      border-radius: 18px; min-height: 76px; margin: 10px 0; padding: 10px 12px 10px 18px; font-weight: 800; font-size: 18px;
+    }
+    .stop.lock { background: #efe6da; color: #7a7268; border-color: #c9bfb2; }
+    .stop.now { background: #ffcf70; box-shadow: 0 6px 0 #1c1915; }
+    .stop.done { background: #146c36; color: white; }
+    .card {
+      background: white; border: 2px solid #1c1915; border-radius: 16px; padding: 10px; margin-bottom: 10px;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .swatch { width: 74px; height: 74px; border-radius: 12px; flex: none; border: 2px solid #1c1915; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fact { min-height: 88px; border-radius: 16px; border: 2px solid #1c1915; background: white; font-weight: 800; opacity: .4; }
+    .fact.lit { opacity: 1; background: #fff3d6; }
+    .faces { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .facebtn {
+      aspect-ratio: 1; border-radius: 18px; border: 2px solid #1c1915; background: #ffe1cc; font-weight: 800; font-size: 20px;
+    }
+    .facebtn.endorsed { background: #146c36; color: white; }
+    .back { border: 0; background: transparent; font-weight: 800; font-size: 16px; padding: 0; text-align: left; }
+    .potline { display: flex; align-items: center; justify-content: space-between; font-weight: 800; }
+    .jump { transform: translateY(-8px); transition: transform .2s; }
+    @media (max-width: 760px) {
+      .split { flex-direction: column; align-items: center; }
+      .notes { width: min(390px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="pagehead">
+    <a href="index.html">All samples</a>
+    <h1>Raasta, combined</h1>
+    <p>One phone for Meena, class 12. The microphone is the product. Everything else is a picture she can tap or hear.</p>
+  </header>
+  <div class="split">
+    <aside class="notes">
+      <h2>What stayed</h2>
+      <ol>
+        <li><b>Hello Ujjivan</b> Picture chips, and a speaker on the greeting, the schemes, and the parent note.</li>
+        <li><b>CPGRAMS</b> One tap starts talk. Nothing saves until she confirms the words.</li>
+        <li><b>Duolingo</b> One question at a time, then a road of stops. Tap Path to talk to the live counsellor.</li>
+        <li><b>Khan Academy Kids</b> The guide reacts, a ding marks a saved profile, and a coin lands in the pot.</li>
+        <li><b>YouTube</b> Nearby schemes are large pictures. Search is the same microphone.</li>
+      </ol>
+    </aside>
+    <div class="phone" id="phone">
+      <div class="status"><span>9:41</span><span id="pot">Pot ₹0</span></div>
+      <div class="screen">
+        <section class="view" data-view="home">
+          <div class="greet">
+            <svg width="64" height="64" viewBox="0 0 64 64" id="guide" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#ffcf70" stroke="#1c1915" stroke-width="3"/><circle cx="24" cy="28" r="3"/><circle cx="40" cy="28" r="3"/><path d="M22 40c4 6 16 6 20 0" fill="none" stroke="#1c1915" stroke-width="3" stroke-linecap="round"/></svg>
+            <div style="flex:1">
+              <h2>Hello, Meena</h2>
+              <p>Class 12 · village</p>
+            </div>
+            <button class="speak" data-say="Hello Meena. Tap the big button to talk." aria-label="Hear greeting"></button>
+          </div>
+          <div class="miczone">
+            <button class="bigmic press" id="start" aria-label="Talk">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/></svg>
+            </button>
+            <strong>Talk</strong>
+            <span>Tap once.</span>
+          </div>
+          <div class="chips">
+            <button class="chip press" data-goto="path">Path</button>
+            <button class="chip press" data-goto="money">Money</button>
+            <button class="chip press" data-goto="parent">Parents</button>
+          </div>
+          <div class="strip">
+            <button class="mini press" style="background:#ffe58a" data-goto="money">Yellow form<br>₹12,000</button>
+            <button class="mini press" style="background:#cfeedd" data-goto="money">Workshop<br>NAPS</button>
+          </div>
+        </section>
+
+        <section class="view" data-view="listen" hidden>
+          <button class="back" data-goto="home">← Stop</button>
+          <h3 id="listen-title">Listening</h3>
+          <p id="listen-hint">Keep talking. The screen stays awake.</p>
+          <div class="wave" id="wave"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="pills" id="pills"></div>
+          <button class="yes" id="yes" disabled>Yes · This is me</button>
+        </section>
+
+        <section class="view counselor" data-view="path" hidden>
+          <div id="counselor"></div>
+        </section>
+
+        <section class="view" data-view="money" hidden>
+          <div class="greet">
+            <h3 style="flex:1;margin:0">Nearby help</h3>
+            <button class="speak" data-say="Scholarships and training near you." aria-label="Hear opportunities"></button>
+          </div>
+          <button class="bigmic press" id="find" style="width:72px;height:72px;box-shadow:0 6px 0 #9a3d0e;margin:10px 0" aria-label="Search by voice">
+            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/></svg>
+          </button>
+          <p id="found" hidden></p>
+          <article class="card" data-kind="aid">
+            <div class="swatch" style="background:#f5c518"></div>
+            <div style="flex:1"><b>Yellow form</b><br>₹12,000 · Friday</div>
+            <button class="speak" data-say="Scholarship of twelve thousand. Friday is the last day." aria-label="Hear scholarship"></button>
+          </article>
+          <article class="card" data-kind="work">
+            <div class="swatch" style="background:#7dcca0"></div>
+            <div style="flex:1"><b>Workshop</b><br>NAPS · stipend</div>
+            <button class="speak" data-say="Training nearby. It pays every month." aria-label="Hear apprenticeship"></button>
+          </article>
+          <article class="card" data-kind="learn">
+            <div class="swatch" style="background:#f0a06a"></div>
+            <div style="flex:1"><b>Phone repair</b><br>3 lessons this week</div>
+            <button class="speak" data-say="Three lessons this week." aria-label="Hear lesson"></button>
+          </article>
+        </section>
+
+        <section class="view" data-view="parent" hidden>
+          <button class="back" data-goto="home">← Home</button>
+          <div class="greet">
+            <h3 style="flex:1">For parents</h3>
+            <button class="speak" data-say="A short note. No fee. Six months. Eight thousand a month. The training centre is safe." aria-label="Hear parent note"></button>
+          </div>
+          <p>A 60-second note. This preview plays it faster.</p>
+          <button class="wide" id="note">Hear the note</button>
+          <div class="facts" style="margin-top:12px">
+            <div class="fact" data-fact>Fees ₹0</div>
+            <div class="fact" data-fact>6 months</div>
+            <div class="fact" data-fact>₹8,000 / month</div>
+            <div class="fact" data-fact>Safe</div>
+          </div>
+        </section>
+
+        <section class="view" data-view="teacher" hidden>
+          <h3>Teacher</h3>
+          <p id="count">8 students · 0 endorsed</p>
+          <div class="faces" id="faces"></div>
+          <button class="wide" id="record">Record a lesson</button>
+          <p id="recorded" hidden>Voice lesson saved. She can offer it free.</p>
+        </section>
+      </div>
+      <nav class="nav">
+        <button data-goto="path">Path</button>
+        <button class="talk" data-goto="listen" id="nav-talk">Talk</button>
+        <button data-goto="money">Money</button>
+        <button data-goto="teacher">Teacher</button>
+      </nav>
+    </div>
+  </div>
+  <div class="sr" aria-live="polite" id="live"></div>
+  <script src="counselor.js"></script>
+  <script>
+    const lines = ["English", "I repair phones", "I know stitching", "Class 12"];
+    const views = document.querySelectorAll("[data-view]");
+    let timers = [];
+    let rupees = 0;
+    const audio = { ctx: null };
+
+    function clearTimers() { timers.forEach((t) => clearTimeout(t)); timers = []; }
+    function show(name) {
+      clearTimers();
+      views.forEach((v) => { v.hidden = v.dataset.view !== name; });
+      document.querySelectorAll(".nav button").forEach((b) => {
+        b.classList.toggle("on", b.dataset.goto === name);
+      });
+      if (name === "listen") startListen();
+      if (name === "path") Counselor.open();
+    }
+    function say(text) {
+      document.getElementById("live").textContent = text;
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-IN";
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function tone(freq, dur) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audio.ctx) audio.ctx = new AC();
+      const o = audio.ctx.createOscillator();
+      const g = audio.ctx.createGain();
+      o.frequency.value = freq;
+      o.connect(g); g.connect(audio.ctx.destination);
+      g.gain.setValueAtTime(0.05, audio.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audio.ctx.currentTime + dur);
+      o.start(); o.stop(audio.ctx.currentTime + dur);
+    }
+    function speakerIcon() {
+      return '<svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 15 12z"/></svg>';
+    }
+    document.querySelectorAll(".speak").forEach((el) => {
+      el.innerHTML = speakerIcon();
+      el.addEventListener("click", () => {
+        el.classList.add("on");
+        say(el.dataset.say);
+        setTimeout(() => el.classList.remove("on"), 1200);
+      });
+    });
+    document.body.addEventListener("click", (e) => {
+      const go = e.target.closest("[data-goto]");
+      if (!go) return;
+      show(go.dataset.goto);
+    });
+
+    function startListen() {
+      clearTimers();
+      const pills = document.getElementById("pills");
+      pills.innerHTML = "";
+      const yes = document.getElementById("yes");
+      yes.disabled = true;
+      yes.textContent = "Yes · This is me";
+      document.getElementById("wave").hidden = false;
+      document.getElementById("listen-title").textContent = "Listening";
+      document.getElementById("listen-hint").textContent = "Keep talking. The screen stays awake.";
+      lines.forEach((line, i) => {
+        timers.push(setTimeout(() => {
+          const s = document.createElement("span");
+          s.textContent = line;
+          pills.appendChild(s);
+          document.getElementById("live").textContent = line;
+          if (i === lines.length - 1) {
+            document.getElementById("wave").hidden = true;
+            yes.disabled = false;
+            document.getElementById("listen-title").textContent = "Is this right?";
+            document.getElementById("listen-hint").textContent = "Nothing is saved until you tap yes.";
+          }
+        }, 650 * (i + 1)));
+      });
+    }
+    document.getElementById("yes").onclick = () => {
+      tone(880, 0.16); setTimeout(() => tone(1175, 0.2), 110);
+      rupees += 1;
+      document.getElementById("pot").textContent = "Pot ₹" + rupees;
+      document.getElementById("guide").classList.add("jump");
+      document.getElementById("yes").textContent = "Saved";
+      document.getElementById("yes").disabled = true;
+      timers.push(setTimeout(() => show("path"), 700));
+    };
+    document.getElementById("find").onclick = (e) => {
+      e.stopPropagation();
+      const found = document.getElementById("found");
+      found.hidden = false;
+      found.textContent = "Heard: scholarship";
+      document.querySelectorAll("#phone .card").forEach((card) => {
+        card.hidden = card.dataset.kind !== "aid";
+      });
+      say("Showing scholarships");
+    };
+    const facts = document.querySelectorAll("[data-fact]");
+    document.getElementById("note").onclick = () => {
+      facts.forEach((f) => f.classList.remove("lit"));
+      say("A note for your parents. No fee. Six months. Eight thousand a month.");
+      facts.forEach((f, i) => timers.push(setTimeout(() => f.classList.add("lit"), 500 * (i + 1))));
+    };
+    const faces = ["M", "K", "R", "A", "S", "L", "P", "T"];
+    const box = document.getElementById("faces");
+    faces.forEach((ch) => {
+      const b = document.createElement("button");
+      b.className = "facebtn press";
+      b.textContent = ch;
+      b.onclick = () => {
+        b.classList.toggle("endorsed");
+        const n = box.querySelectorAll(".endorsed").length;
+        document.getElementById("count").textContent = "8 students · " + n + " endorsed";
+      };
+      box.appendChild(b);
+    });
+    document.getElementById("record").onclick = () => {
+      document.getElementById("recorded").hidden = false;
+      say("Lesson saved. She can offer it free.");
+    };
+    document.getElementById("start").onclick = () => show("listen");
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta · a guide, a sound, a prize</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .phone { background: #fff4df; }
+    .home, .quiz { height: 100%; display: flex; flex-direction: column; padding: 8px 18px 18px; }
+    h2 { font-size: 30px; margin: 8px 0 0; letter-spacing: -0.03em; }
+    .hero { flex: 1; display: grid; place-items: center; position: relative; }
+    .play {
+      width: 168px; height: 168px; border-radius: 50%; border: 4px solid #1c1915;
+      background: #1aaa64; color: white; font-size: 28px; font-weight: 800;
+      box-shadow: 0 10px 0 #0d6b3d;
+    }
+    .pot {
+      position: absolute; right: 0; top: 8px; text-align: center; font-weight: 800;
+    }
+    .pot svg { width: 72px; height: 64px; display: block; }
+    .coins { color: #0d7a45; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .pic {
+      min-height: 132px; border-radius: 18px; border: 3px solid #1c1915;
+      background: white; font-weight: 800; font-size: 15px;
+    }
+    .pic.good { background: #cfeedd; }
+    .pic.bad { background: #ffd0d0; }
+    .say { font-size: 22px; font-weight: 800; margin: 0 0 12px; }
+    .spark {
+      position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #f5c518;
+      border: 2px solid #1c1915; pointer-events: none;
+    }
+    .face { width: 120px; height: 120px; transition: transform .25s ease; }
+    .face.up { transform: translateY(-16px); }
+    .face.think { transform: rotate(-8deg); }
+  </style>
+</head>
+<body>
+  <header class="pagehead">
+    <a href="index.html">All samples</a>
+    <h1>A guide, a sound, and a prize</h1>
+    <p>Khan Academy Kids pattern. One play button starts a picture question. A bright ding means yes, a soft tone means try again. Coins fly into the pot, so progress is something you can see.</p>
+  </header>
+  <div class="stage">
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Raasta</span></div>
+      <div class="screen">
+        <div class="home" id="home">
+          <h2>வணக்கம், மீனா</h2>
+          <p>Tap play. The guide will show the next step.</p>
+          <div class="hero">
+            <svg class="face" id="face" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="54" fill="#ffcf70" stroke="#1c1915" stroke-width="4"/>
+              <circle cx="42" cy="52" r="6" fill="#1c1915"/><circle cx="78" cy="52" r="6" fill="#1c1915"/>
+              <path id="mouth" d="M40 74c8 12 32 12 40 0" fill="none" stroke="#1c1915" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <button class="play press" id="play">தொடங்கு</button>
+          </div>
+        </div>
+        <div class="quiz" id="quiz" hidden>
+          <div class="pot" id="pot">
+            <svg viewBox="0 0 72 64"><path d="M16 22h40l-5 32H21z" fill="#c47a3a" stroke="#1c1915" stroke-width="3"/><ellipse cx="36" cy="22" rx="20" ry="7" fill="#e7b07a" stroke="#1c1915" stroke-width="3"/></svg>
+            <div class="coins" id="coins">₹ 0</div>
+          </div>
+          <p class="say">போன் பழுதுக்கு எந்த கருவி?</p>
+          <div class="hero" id="stage">
+            <svg class="face" id="qface" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="#ffcf70" stroke="#1c1915" stroke-width="4"/><circle cx="42" cy="52" r="6"/><circle cx="78" cy="52" r="6"/><path d="M42 78h36" fill="none" stroke="#1c1915" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="choices">
+            <button class="pic press" data-ok="0">புத்தகம்<br>Book</button>
+            <button class="pic press" data-ok="1">ஸ்க்ரூ<br>Screwdriver</button>
+            <button class="pic press" data-ok="0">பானை<br>Pot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let money = 0;
+    const ctxHolder = { ctx: null };
+    function tone(freq, dur) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!ctxHolder.ctx) ctxHolder.ctx = new AudioCtx();
+      const ctx = ctxHolder.ctx;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.06, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      o.start(); o.stop(ctx.currentTime + dur);
+    }
+    document.getElementById("play").onclick = () => {
+      document.getElementById("home").hidden = true;
+      document.getElementById("quiz").hidden = false;
+    };
+    document.querySelectorAll(".pic").forEach((btn) => {
+      btn.onclick = () => {
+        const face = document.getElementById("qface");
+        if (btn.dataset.ok === "1") {
+          tone(880, 0.18); setTimeout(() => tone(1175, 0.22), 120);
+          btn.classList.add("good");
+          face.classList.add("up");
+          money += 1;
+          document.getElementById("coins").textContent = "₹ " + money;
+          const stage = document.getElementById("stage");
+          const pot = document.getElementById("pot").getBoundingClientRect();
+          const from = face.getBoundingClientRect();
+          for (let i = 0; i < 6; i++) {
+            const s = document.createElement("i");
+            s.className = "spark";
+            stage.appendChild(s);
+            const startX = 80 + Math.random() * 40;
+            const startY = 80;
+            s.style.left = startX + "px";
+            s.style.top = startY + "px";
+            s.animate([
+              { transform: "translate(0,0)", opacity: 1 },
+              { transform: `translate(${pot.left - from.left}px, ${pot.top - from.top}px)`, opacity: 0.2 }
+            ], { duration: 700, delay: i * 60, easing: "ease-in" });
+            setTimeout(() => s.remove(), 900);
+          }
+          setTimeout(() => face.classList.remove("up"), 500);
+        } else {
+          tone(196, 0.25);
+          btn.classList.add("bad");
+          face.classList.add("think");
+          setTimeout(() => { btn.classList.remove("bad"); face.classList.remove("think"); }, 450);
+        }
+      };
+    });
+  </script>
+</body>
+</html>

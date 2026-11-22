@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta · pictures and a speaker</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    body { background: #e7f0e4; }
+    .phone { background: #f3faf1; }
+    h2 { font-size: 28px; margin: 6px 0 2px; letter-spacing: -0.03em; }
+    .sub { margin: 0; color: var(--muted); }
+    .top { display: flex; align-items: center; gap: 12px; padding: 8px 18px 4px; }
+    .search {
+      margin: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border: 2px solid #1c1915; border-radius: 999px;
+      padding: 6px 8px 6px 16px; font-weight: 700;
+    }
+    .search .mic {
+      margin-left: auto; width: 52px; height: 52px; border-radius: 50%;
+      border: 0; background: #f5c518; display: grid; place-items: center;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 18px 24px; }
+    .tile {
+      background: #fff; border: 2px solid #1c1915; border-radius: 22px;
+      min-height: 196px; padding: 12px; text-align: left;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .art { height: 86px; border-radius: 16px; display: grid; place-items: center; }
+    .tile b { font-size: 20px; line-height: 1.15; }
+    .tile small { color: var(--muted); font-size: 13px; }
+    .row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+    .yellow { background: #ffe58a; }
+    .green { background: #cfeedd; }
+    .clay { background: #ffd0b5; }
+    .blue { background: #d5e7ff; }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: #fff; border-top: 3px solid #1c1915;
+      border-radius: 24px 24px 0 0; padding: 16px 18px 22px;
+      transform: translateY(110%); transition: transform .25s ease;
+    }
+    .sheet.open { transform: translateY(0); }
+    .sheet h3 { margin: 0 0 10px; font-size: 22px; }
+    .step { display: flex; gap: 10px; align-items: center; padding: 8px 0; font-size: 18px; font-weight: 700; }
+    .bubble {
+      margin: 0 18px 8px; background: #143d28; color: white;
+      border-radius: 16px; padding: 12px 14px; font-weight: 700; min-height: 48px;
+    }
+    .x {
+      border: 0; background: #efe7d4; border-radius: 999px; padding: 8px 14px; font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <header class="pagehead">
+    <a href="index.html">All samples</a>
+    <h1>Pictures and a speaker</h1>
+    <p>Hello Ujjivan pattern, filled with Raasta. Tap a picture to open it. Tap the speaker to hear it without opening. The mic on the search bar listens for a word like “ஸ்காலர்ஷிப்”.</p>
+  </header>
+  <div class="stage">
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Raasta</span></div>
+      <div class="screen">
+        <div class="top">
+          <div>
+            <h2>வணக்கம், மீனா</h2>
+            <p class="sub">Hello, Meena · class 12</p>
+          </div>
+        </div>
+        <div class="search">
+          <span>குரல் தேடல்</span>
+          <button class="mic press" id="voice" aria-label="Voice search">
+            <svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/></svg>
+          </button>
+        </div>
+        <p class="bubble" id="said" hidden></p>
+        <div class="grid" id="grid">
+          <button class="tile press" data-title="பேசு" data-en="Talk" data-say="பத்து நிமிடம் பேசு. உன் திறமை தெரியும்.">
+            <div class="art clay" aria-hidden="true">
+              <svg width="74" height="64" viewBox="0 0 74 64"><rect x="28" y="8" width="18" height="30" rx="9" fill="#1c1915"/><rect x="22" y="30" width="30" height="16" rx="8" fill="none" stroke="#1c1915" stroke-width="4"/><rect x="34" y="46" width="6" height="10" fill="#1c1915"/></svg>
+            </div>
+            <div class="row"><div><b>பேசு</b><br><small>Talk</small></div>
+              <span class="speak" data-say="பேசு. உன்னிடம் பேச ஒரு பெரிய பட்டன்." role="button" tabindex="0" aria-label="Hear Talk"></span>
+            </div>
+          </button>
+          <button class="tile press" data-title="உதவித்தொகை" data-en="Scholarship" data-say="மஞ்சள் காகிதம் ஒரு உதவித்தொகை. கடைசி நாள் முன்பு கேள்.">
+            <div class="art yellow" aria-hidden="true">
+              <svg width="70" height="64" viewBox="0 0 70 64"><rect x="16" y="8" width="40" height="48" rx="4" fill="#f5c518" stroke="#1c1915" stroke-width="3"/><path d="M24 22h24M24 32h24M24 42h14" stroke="#1c1915" stroke-width="3"/></svg>
+            </div>
+            <div class="row"><div><b>காகிதம்</b><br><small>Scholarship</small></div>
+              <span class="speak" data-say="மஞ்சள் காகிதம். உதவித்தொகை." role="button" tabindex="0" aria-label="Hear scholarship"></span>
+            </div>
+          </button>
+          <button class="tile press" data-title="முதல் ரூபாய்" data-en="First rupee" data-say="பானையில் விழும் முதல் ரூபாய் தான் இலக்கு.">
+            <div class="art green" aria-hidden="true">
+              <svg width="74" height="64" viewBox="0 0 74 64"><path d="M22 24h30l-4 28H26z" fill="#c47a3a" stroke="#1c1915" stroke-width="3"/><ellipse cx="37" cy="24" rx="16" ry="6" fill="#e7b07a" stroke="#1c1915" stroke-width="3"/><circle cx="48" cy="16" r="8" fill="#0d7a45" stroke="#1c1915" stroke-width="3"/><text x="48" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">₹</text></svg>
+            </div>
+            <div class="row"><div><b>பானை</b><br><small>First rupee</small></div>
+              <span class="speak" data-say="பானை. முதல் ரூபாய் இங்கே விழும்." role="button" tabindex="0" aria-label="Hear first rupee"></span>
+            </div>
+          </button>
+          <button class="tile press" data-title="பெற்றோர்" data-en="Parents" data-say="அம்மா அப்பாவுக்கு அறுபது வினாடி குரல்.">
+            <div class="art blue" aria-hidden="true">
+              <svg width="78" height="64" viewBox="0 0 78 64"><circle cx="26" cy="20" r="8" fill="#f2c1a0" stroke="#1c1915" stroke-width="3"/><circle cx="52" cy="20" r="8" fill="#e2a878" stroke="#1c1915" stroke-width="3"/><path d="M12 52c2-12 10-16 14-16s12 4 14 16M38 52c2-12 10-16 14-16s12 4 14 16" fill="#7eb0e8" stroke="#1c1915" stroke-width="3"/></svg>
+            </div>
+            <div class="row"><div><b>அம்மா</b><br><small>Parents</small></div>
+              <span class="speak" data-say="அம்மா அப்பாவுக்கு ஒரு குரல் செய்தி." role="button" tabindex="0" aria-label="Hear parents"></span>
+            </div>
+          </button>
+        </div>
+        <div class="sheet" id="sheet">
+          <button class="x" id="close">மூடு · Close</button>
+          <h3 id="sheet-title">பேசு</h3>
+          <div class="step">1 · பேசு · Talk for 10 minutes</div>
+          <div class="step">2 · படம் · See what Raasta heard</div>
+          <div class="step">3 · சரி · Tap yes</div>
+          <p id="sheet-say"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const said = document.getElementById("said");
+    const sheet = document.getElementById("sheet");
+    function say(text) {
+      said.hidden = false;
+      said.textContent = text;
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "ta-IN";
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    document.querySelectorAll(".speak").forEach((el) => {
+      el.innerHTML = '<svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 15 12z"/></svg>';
+      const play = (e) => { e.stopPropagation(); e.preventDefault(); say(el.dataset.say); };
+      el.addEventListener("click", play);
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter") play(e); });
+    });
+    document.getElementById("grid").addEventListener("click", (e) => {
+      const tile = e.target.closest(".tile");
+      if (!tile || e.target.closest(".speak")) return;
+      document.getElementById("sheet-title").textContent = tile.dataset.title + " · " + tile.dataset.en;
+      document.getElementById("sheet-say").textContent = tile.dataset.say;
+      sheet.classList.add("open");
+      say(tile.dataset.say);
+    });
+    document.getElementById("close").onclick = () => sheet.classList.remove("open");
+    document.getElementById("voice").onclick = () => say("கேட்டது: உதவித்தொகை. மஞ்சள் காகிதத்தைத் திற.");
+  </script>
+</body>
+</html>

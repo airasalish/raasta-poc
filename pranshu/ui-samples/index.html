@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta UI samples</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .wrap { max-width: 880px; margin: 0 auto; padding: 18px 22px 64px; }
+    .lead { font-size: 18px; line-height: 1.5; max-width: 68ch; }
+    .grid { display: grid; gap: 14px; margin-top: 22px; }
+    a.card {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      background: #fffdf8;
+      border: 2px solid #1c1915;
+      border-radius: 18px;
+      padding: 16px 18px;
+    }
+    a.card strong { display: block; font-size: 20px; letter-spacing: -0.02em; }
+    a.card span { display: block; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .num {
+      width: 72px; height: 72px; border-radius: 16px;
+      display: grid; place-items: center; font-weight: 800; font-size: 22px;
+      background: #f6e2c4;
+    }
+    a.best { background: #1c1915; color: #fffaf3; }
+    a.best span { color: #e7d3b5; }
+    a.best .num { background: #e36a1e; color: #1c1915; }
+    .go { font-weight: 800; }
+    h1 { font-size: 40px; letter-spacing: -0.04em; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="lead">Six phone screens for Raasta. The first five each borrow one interface. The last one keeps the part that fits a rural student who may not read fluently.</p>
+    <h1>Open them in this order.</h1>
+    <div class="grid">
+      <a class="card" href="01-pictures-and-voice.html">
+        <div class="num">01</div>
+        <div>
+          <strong>Pictures and a speaker</strong>
+          <span>Hello Ujjivan. Every action is a familiar object, and every card can be heard.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+      <a class="card" href="02-one-tap-talk.html">
+        <div class="num">02</div>
+        <div>
+          <strong>One tap, then talk</strong>
+          <span>CPGRAMS voice filing. No language menu. Raasta shows what it heard before saving.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+      <a class="card" href="03-one-step-path.html">
+        <div class="num">03</div>
+        <div>
+          <strong>Only the next step</strong>
+          <span>Duolingo’s path. One open stop. The student picks a picture, and the road moves forward.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+      <a class="card" href="04-guide-and-sound.html">
+        <div class="num">04</div>
+        <div>
+          <strong>A guide, a sound, a prize</strong>
+          <span>Khan Academy Kids. A character shows what to do. Right and wrong are sounds, and a pot fills up.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+      <a class="card" href="05-picture-feed.html">
+        <div class="num">05</div>
+        <div>
+          <strong>Big pictures to browse</strong>
+          <span>YouTube. Schemes are thumbnails. Search is a microphone, not a form.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+      <a class="card best" href="06-raasta.html">
+        <div class="num">06</div>
+        <div>
+          <strong>Raasta, combined</strong>
+          <span>The mic leads. Pictures and speakers stay. Path opens the live AI counsellor: questions, jobs, then a road with schemes. Needs the server on port 8000.</span>
+        </div>
+        <div class="go">Open</div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

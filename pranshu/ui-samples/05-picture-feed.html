@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta · big pictures to browse</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .phone { background: #fff; }
+    .screen { padding: 6px 0 12px; }
+    .find {
+      margin: 4px 14px 10px; display: flex; align-items: center; gap: 8px;
+      border: 2px solid #1c1915; border-radius: 999px; padding: 6px 8px 6px 16px;
+      font-weight: 800;
+    }
+    .find button {
+      margin-left: auto; width: 48px; height: 48px; border-radius: 50%; border: 0; background: #e11d48; color: white;
+    }
+    .chips { display: flex; gap: 8px; padding: 0 14px 10px; overflow: auto; }
+    .chips button {
+      border: 2px solid #1c1915; background: white; border-radius: 999px;
+      padding: 8px 14px; font-weight: 800; white-space: nowrap;
+    }
+    .chips button.on { background: #1c1915; color: white; }
+    .card { margin: 0 14px 16px; }
+    .thumb {
+      height: 168px; border-radius: 16px; border: 2px solid #1c1915; position: relative;
+      display: grid; place-items: center; width: 100%;
+    }
+    .play {
+      width: 64px; height: 64px; border-radius: 50%; background: white; border: 3px solid #1c1915;
+      font-size: 22px;
+    }
+    .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; }
+    .meta b { font-size: 18px; }
+    .meta small { display: block; color: var(--muted); }
+    .y { background: linear-gradient(#ffe58a, #f5c518); }
+    .g { background: linear-gradient(#d8f5e4, #7dcca0); }
+    .o { background: linear-gradient(#ffd7bf, #f0a06a); }
+    .overlay {
+      position: absolute; inset: 0; background: #1c1915; color: white;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 18px;
+    }
+    .overlay h3 { font-size: 28px; margin: 0 0 8px; }
+    .big {
+      height: 74px; border-radius: 16px; border: 0; background: #f5c518; color: #1c1915;
+      font-size: 22px; font-weight: 800;
+    }
+    .back { align-self: flex-start; background: transparent; color: white; border: 0; font-weight: 800; font-size: 18px; margin-bottom: auto; }
+    .heard { margin: 0 14px 8px; font-weight: 800; color: #9f1239; }
+  </style>
+</head>
+<body>
+  <header class="pagehead">
+    <a href="index.html">All samples</a>
+    <h1>Big pictures to browse</h1>
+    <p>YouTube’s home, used for schemes. The microphone stands in for the search box. Picture chips filter the feed. Opening a card speaks the deadline instead of asking anyone to read a portal.</p>
+  </header>
+  <div class="stage">
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Raasta</span></div>
+      <div class="screen" id="feed">
+        <div class="find">
+          <span id="q">தேடு</span>
+          <button id="mic" aria-label="Voice search">
+            <svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11h-2z"/></svg>
+          </button>
+        </div>
+        <p class="heard" id="heard" hidden></p>
+        <div class="chips">
+          <button class="on" data-filter="all">அனைத்தும்</button>
+          <button data-filter="aid">உதவித்தொகை</button>
+          <button data-filter="work">வேலை</button>
+          <button data-filter="learn">படிப்பு</button>
+        </div>
+        <article class="card" data-kind="aid">
+          <button class="thumb y" data-title="NSP உதவித்தொகை" data-say="பன்னிரண்டு ஆயிரம் ரூபாய். கடைசி நாள் வரும் வெள்ளி.">
+            <span class="play">▶</span>
+          </button>
+          <div class="meta"><div><b>மஞ்சள் காகிதம்</b><small>₹12,000 · Friday</small></div><span class="speak" data-say="உதவித்தொகை பன்னிரண்டு ஆயிரம். வெள்ளி கடைசி நாள்."></span></div>
+        </article>
+        <article class="card" data-kind="work">
+          <button class="thumb g" data-title="NAPS பயிற்சி" data-say="அருகிலுள்ள பணிமனை. மாதம் ஊதியம் உண்டு.">
+            <span class="play">▶</span>
+          </button>
+          <div class="meta"><div><b>பணிமனை</b><small>NAPS · nearby</small></div><span class="speak" data-say="அருகில் ஒரு பயிற்சி. மாதம் ஊதியம் கிடைக்கும்."></span></div>
+        </article>
+        <article class="card" data-kind="learn">
+          <button class="thumb o" data-title="போன் பழுது பாடம்" data-say="இந்த வாரம் மூன்று குறும் பாடங்கள். தமிழில்.">
+            <span class="play">▶</span>
+          </button>
+          <div class="meta"><div><b>இந்த வாரம்</b><small>3 short lessons</small></div><span class="speak" data-say="இந்த வாரம் மூன்று குறும் பாடங்கள்."></span></div>
+        </article>
+      </div>
+      <div class="overlay" id="player" hidden>
+        <button class="back" id="back">← திரும்பு</button>
+        <h3 id="ptitle"></h3>
+        <button class="big" id="psay">கேள் · Listen</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let current = "";
+    function say(text) {
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "ta-IN";
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    document.querySelectorAll(".speak").forEach((el) => {
+      el.innerHTML = '<svg class="ico" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 15 12z"/></svg>';
+      el.addEventListener("click", () => say(el.dataset.say));
+    });
+    document.querySelectorAll(".thumb").forEach((btn) => {
+      btn.onclick = () => {
+        current = btn.dataset.say;
+        document.getElementById("ptitle").textContent = btn.dataset.title;
+        document.getElementById("player").hidden = false;
+        say(current);
+      };
+    });
+    document.getElementById("psay").onclick = () => say(current);
+    document.getElementById("back").onclick = () => document.getElementById("player").hidden = true;
+    document.querySelectorAll(".chips button").forEach((chip) => {
+      chip.onclick = () => {
+        document.querySelectorAll(".chips button").forEach((c) => c.classList.remove("on"));
+        chip.classList.add("on");
+        document.querySelectorAll(".card").forEach((card) => {
+          card.hidden = chip.dataset.filter !== "all" && card.dataset.kind !== chip.dataset.filter;
+        });
+      };
+    });
+    document.getElementById("mic").onclick = () => {
+      const heard = document.getElementById("heard");
+      heard.hidden = false;
+      heard.textContent = "கேட்டது: உதவித்தொகை";
+      document.querySelector('[data-filter="aid"]').click();
+      say("உதவித்தொகை காட்டுகிறேன்");
+    };
+  </script>
+</body>
+</html>

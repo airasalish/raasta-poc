@@ -1,0 +1,138 @@
+:root {
+  --ink: #1c1915;
+  --muted: #5e564c;
+  --paper: #efe2cf;
+  --phone: #fffaf3;
+  --line: #ead9c2;
+  --saffron: #e36a1e;
+  --saffron-deep: #b8430c;
+  --leaf: #0d7a45;
+  --sky: #1d4e89;
+  --card: #fffdf8;
+  --shadow: 0 24px 60px rgba(70, 42, 8, 0.16);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 420px at 50% -80px, #fff 0%, transparent 55%),
+    var(--paper);
+  color: var(--ink);
+  font-family: "Nirmala UI", "Segoe UI", sans-serif;
+}
+
+button, input { font-family: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+.pagehead {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px 22px 0;
+}
+
+.pagehead a {
+  color: var(--sky);
+  font-weight: 750;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pagehead h1 {
+  margin: 10px 0 6px;
+  font-size: 30px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.pagehead p {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.stage {
+  display: flex;
+  justify-content: center;
+  padding: 22px 16px 56px;
+}
+
+.phone {
+  width: min(390px, 100%);
+  max-width: 390px;
+  height: 800px;
+  min-width: 0;
+  background: var(--phone);
+  border: 10px solid #1c1915;
+  border-radius: 38px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.status {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 20px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  flex: none;
+}
+
+.screen {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+[hidden] { display: none !important; }
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.speak {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+}
+
+.speak svg, .ico { width: 26px; height: 26px; display: block; }
+
+.speak.on { background: var(--saffron); }
+
+.press:active { transform: scale(0.98); }
+
+:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

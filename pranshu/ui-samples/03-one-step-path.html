@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raasta · only the next step</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .phone { background: #e8f7df; }
+    .screen { padding: 8px 18px 120px; }
+    h2 { margin: 4px 0; font-size: 28px; letter-spacing: -0.03em; }
+    .sub { margin: 0 0 12px; color: #24613a; font-weight: 700; }
+    .path { list-style: none; margin: 0; padding: 0 0 0 0; position: relative; }
+    .path::before {
+      content: ""; position: absolute; left: 50%; top: 20px; bottom: 20px; width: 12px;
+      background: #b7e0a4; border-radius: 99px; transform: translateX(-50%);
+    }
+    .path li { position: relative; height: 108px; }
+    .node {
+      position: absolute; top: 16px; width: 148px; height: 76px; border-radius: 24px;
+      border: 3px solid #1c1915; font-weight: 800; font-size: 16px; background: white;
+    }
+    .path li:nth-child(odd) .node { left: 8px; }
+    .path li:nth-child(even) .node { right: 8px; }
+    .node.done { background: #146c36; color: white; }
+    .node.now { background: #ffcf70; box-shadow: 0 8px 0 #1c1915; }
+    .node.lock { background: #d5d0c6; color: #6d675e; border-color: #8a847a; }
+    .face {
+      position: absolute; right: 18px; bottom: 210px; width: 84px; height: 84px;
+      transition: transform .25s ease;
+    }
+    .face.jump { transform: translateY(-18px) rotate(-6deg); }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; background: white;
+      border-top: 3px solid #1c1915; padding: 14px 16px 18px;
+    }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .choice {
+      min-height: 120px; border-radius: 18px; border: 3px solid #1c1915;
+      background: #fff7e8; font-weight: 800; font-size: 18px;
+    }
+    .choice small { display: block; font-weight: 700; color: var(--muted); }
+    .ask { margin: 0 0 8px; font-size: 20px; font-weight: 800; }
+  </style>
+</head>
+<body>
+  <header class="pagehead">
+    <a href="index.html">All samples</a>
+    <h1>Only the next step</h1>
+    <p>Duolingo’s path, without the owl. Finished stops are full. The yellow stop is the only one that opens. Locked stops do nothing. Either picture is a real career, so both move the road forward.</p>
+  </header>
+  <div class="stage">
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Raasta</span></div>
+      <div class="screen">
+        <h2>என் பாதை</h2>
+        <p class="sub">My path · one open stop</p>
+        <ol class="path" id="path">
+          <li><button class="node done" disabled>பேசினோம்<br>Talked</button></li>
+          <li><button class="node now" id="open">எது வரும்?<br>What fits?</button></li>
+          <li><button class="node lock" id="learn" disabled>கற்றுக்கொள்<br>Learn</button></li>
+          <li><button class="node lock" id="rupee" disabled>முதல் ரூபாய்<br>First rupee</button></li>
+        </ol>
+        <svg class="face" id="face" viewBox="0 0 84 84" aria-hidden="true">
+          <circle cx="42" cy="42" r="38" fill="#ffcf70" stroke="#1c1915" stroke-width="3"/>
+          <circle cx="30" cy="36" r="4" fill="#1c1915"/><circle cx="54" cy="36" r="4" fill="#1c1915"/>
+          <path d="M28 52c6 8 22 8 28 0" fill="none" stroke="#1c1915" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sheet" id="sheet" hidden>
+        <p class="ask">எது உனக்கு நன்றாக வரும்?</p>
+        <div class="choices">
+          <button class="choice press" data-label="போன் பழுது">போன் பழுது<small>Phone repair</small></button>
+          <button class="choice press" data-label="தையல்">தையல்<small>Stitching</small></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const sheet = document.getElementById("sheet");
+    const face = document.getElementById("face");
+    document.getElementById("open").onclick = () => { sheet.hidden = false; };
+    document.querySelectorAll(".choice").forEach((btn) => {
+      btn.onclick = () => {
+        face.classList.add("jump");
+        const open = document.getElementById("open");
+        open.classList.remove("now");
+        open.classList.add("done");
+        open.textContent = btn.dataset.label;
+        open.disabled = true;
+        const learn = document.getElementById("learn");
+        learn.classList.remove("lock");
+        learn.classList.add("now");
+        learn.disabled = false;
+        sheet.hidden = true;
+        setTimeout(() => face.classList.remove("jump"), 400);
+      };
+    });
+  </script>
+</body>
+</html>
