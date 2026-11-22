@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102d22">
+  <meta name="description" content="Raasta — the Field Atlas live product presentation.">
+  <title>Raasta · Live Field Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Mukta+Malar:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="presenter.css">
+</head>
+<body>
+  <div class="atlas-bg" aria-hidden="true"><span class="contour contour-a"></span><span class="contour contour-b"></span><span class="route-line"></span><span class="route-node node-a"></span><span class="route-node node-b"></span></div>
+  <header class="presenter-topbar">
+    <a class="presenter-brand" href="presenter.html" aria-label="Raasta live presentation home"><span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19C8 19 7 5 13 5s3 14 7 14"/><circle cx="4" cy="19" r="1.2"/><circle cx="13" cy="5" r="1.2"/></svg></span><span><strong>Raasta</strong><small>THE FIELD ATLAS · ராஸ்தா</small></span></a>
+    <div class="topbar-meta"><span class="live-status"><i></i>LIVE PRODUCT VIEW</span><span class="topbar-divider"></span><span>TEAM ABSOLUTE ZERO</span></div>
+  </header>
+  <main class="presentation-grid">
+    <aside class="story-panel" aria-label="Raasta presentation introduction">
+      <div class="eyebrow">A career map for every student</div>
+      <h1>Make the<br><em>next step</em><br>feel possible.</h1>
+      <p class="story-copy">Talk. Explore careers. Find opportunities. Build a path — in your language.</p>
+      <div class="story-route" aria-hidden="true"><span class="story-route-start"></span><span class="story-route-path"></span><span class="story-route-end"><svg viewBox="0 0 24 24"><path d="M5 19 19 5M9 5h10v10"/></svg></span></div>
+      <div class="story-note"><span class="note-mark">01</span><p><strong>Built around Kavya.</strong><br>17 · Class 12 · Villupuram · Tamil speaker</p></div>
+      <p class="story-foot">A live, interactive product view — not a screenshot.</p>
+    </aside>
+    <section class="device-stage" aria-label="Live Raasta application preview">
+      <div class="device-toolbar" role="toolbar" aria-label="Preview device controls">
+        <div class="toolbar-label"><span class="toolbar-dot"></span>LIVE APP</div>
+        <div class="device-switcher" role="group" aria-label="Preview size">
+          <button type="button" class="device-choice is-active" data-device="mobile" aria-pressed="true">Mobile</button>
+          <button type="button" class="device-choice" data-device="tablet" aria-pressed="false">Tablet</button>
+          <button type="button" class="device-choice" data-device="desktop" aria-pressed="false">Desktop</button>
+        </div>
+        <button type="button" class="toolbar-icon" id="fullscreenBtn" aria-label="Enter fullscreen" title="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg></button>
+      </div>
+      <div class="device-wrap" id="deviceWrap" data-device="mobile">
+        <div class="device-bezel"><div class="device-sensor" aria-hidden="true"><span></span></div><div class="device-screen"><iframe id="appFrame" title="Interactive Raasta application" src="index.html?demo=kavya#start" allow="microphone; autoplay" loading="eager"></iframe><div class="frame-loading" id="frameLoading"><span class="loading-orbit"></span><span>Opening the live route…</span></div></div></div>
+      </div>
+      <div class="stage-caption"><span><b id="frameModeLabel">Mobile view</b> · actual Raasta app</span><span class="caption-hint">Scroll inside the device</span></div>
+    </section>
+    <aside class="control-panel" aria-label="Presenter controls">
+      <div class="panel-heading"><div><div class="eyebrow">Live walkthrough</div><h2>Kavya’s route</h2></div><span class="panel-index" id="stageIndex">01 / 05</span></div>
+      <div class="persona-card"><div class="persona-avatar">க</div><div><strong>Kavya, 17</strong><span>Class 12 · Villupuram</span><span>Govt school · BC/OBC</span></div><span class="persona-pin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2"/></svg></span></div>
+      <div class="stage-list" role="list">
+        <button type="button" class="stage-button is-active" data-stage="talk" role="listitem"><span class="stage-number">01</span><span class="stage-copy"><strong>Talk, Don’t Type</strong><small>Start in her own words</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="careers" role="listitem"><span class="stage-number">02</span><span class="stage-copy"><strong>Career Routes</strong><small>See what fits her skills</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="radar" role="listitem"><span class="stage-number">03</span><span class="stage-copy"><strong>Opportunity Radar</strong><small>Check rules and sources</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="pathway" role="listitem"><span class="stage-number">04</span><span class="stage-copy"><strong>My Pathway</strong><small>Turn direction into weeks</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="parent" role="listitem"><span class="stage-number">05</span><span class="stage-copy"><strong>Parent Mode</strong><small>Make the next step shared</small></span><span class="stage-arrow">↗</span></button>
+      </div>
+      <button type="button" class="run-demo" id="runDemoBtn"><span class="run-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg></span><span><strong>Run Kavya’s demo</strong><small>Open the live starting point</small></span><span class="run-arrow">→</span></button>
+      <div class="control-note"><span class="note-line"></span><p>Use the live app inside the device. Controls only move the preview; they do not replace the product.</p></div>
+    </aside>
+  </main>
+  <footer class="presenter-footer"><span>RAASTA · THE FIELD ATLAS</span><span>Interactive presentation environment</span><span>Demo data · verify before applying</span></footer>
+  <script src="presenter.js"></script>
+</body>
+</html>
