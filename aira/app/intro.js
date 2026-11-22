@@ -29,8 +29,9 @@
     const image = document.createElement('img'); image.className = `${item[1]} field-atlas-screen-art`; image.src = `assets/illustrations/${item[0]}`; image.alt = ''; image.width = view === 'start' ? 320 : 110; image.height = view === 'start' ? 155 : 74; image.decoding = 'async';
     host.prepend(image);
   };
+  const canShow = (key) => { let demo = false; try { demo = sessionStorage.getItem('raasta_demo_mode') === '1'; } catch {} return !!cfg[key] && !seen[key] && !demo; };
   const show = (key) => {
-    if (!cfg[key] || seen[key] || sessionStorage.getItem('raasta_demo_mode') === '1') return;
+    if (!canShow(key)) return;
     current = key;
     lastFocused = document.activeElement;
     const c = cfg[key], l = labels[lang()] || labels.en;
@@ -53,7 +54,7 @@
     const demo = event.target.closest('[data-act="kavya"]');
     if (demo) { sessionStorage.setItem('raasta_demo_mode', '1'); Object.keys(cfg).forEach(mark); return; }
     const parent = event.target.closest('[data-act="parent"]');
-    if (parent && !allowParent) { event.preventDefault(); event.stopImmediatePropagation(); show('parent'); return; }
+    if (parent && !allowParent && canShow('parent')) { event.preventDefault(); event.stopImmediatePropagation(); show('parent'); return; }
     if (parent && allowParent) allowParent = false;
     if (event.target.closest('[data-act="reset-intros"]')) reset();
   }, true);
