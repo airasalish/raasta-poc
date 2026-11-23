@@ -1461,6 +1461,11 @@ main#viewContainer::-webkit-scrollbar-thumb{background:rgba(10,51,39,0.18);borde
 }
 .app-navbar button.locked{opacity:.45}#viewContainer>*{flex-shrink:0}.page-heading{overflow:visible!important;display:flow-root}.nav-back:hover{background:rgba(23,111,80,.08)!important}.route-art{float:right;width:72px;height:72px;border-radius:14px;margin:0 0 6px 10px}
 .ep-version{margin-bottom:10px}.ep-version .ep-demo-btn[aria-pressed="true"]{background:var(--canopy,#0A3327);color:#fff;border-color:transparent}#classicFrame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:60;background:#fbf8f1;border-radius:inherit}.device-screen{position:relative}body.classic-on #breakoutSlot,body.classic-on .ep-demo-deck:not(.ep-version){display:none}
+.peek-phone{display:none!important}
+.app-navbar{grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:1fr}
+.parent-view{display:grid;gap:14px}.parent-card{background:#fff;border:1px solid #d6e0d7;border-radius:16px;padding:14px 16px}.parent-card h2{font-size:17px;margin:2px 0 8px}.parent-card p,.parent-card li{font-size:15px;line-height:1.6}.parent-card ol,.parent-card ul{margin:6px 0 0;padding-left:20px}.parent-card .note{font-size:13px;color:#5b6b61;margin-top:8px}.parent-chips{display:flex;flex-wrap:wrap;gap:6px}.parent-chips span{background:#e3efe6;color:#123d2c;border-radius:999px;padding:5px 11px;font-size:14px;font-weight:600}.parent-scheme{border-top:1px solid #e3eae4;padding:8px 0}.parent-scheme:first-of-type{border-top:0}.parent-scheme strong{display:block}.parent-actions{display:grid;gap:10px}.parent-actions a{text-align:center;text-decoration:none}.parent-listen{float:right;border:0;background:none;color:#176f50;font-weight:700;cursor:pointer;font-size:13px;min-height:32px}
+#versionFab{position:fixed;left:12px;bottom:92px;padding:6px 12px!important;min-height:34px!important;opacity:.92;z-index:80;border:1px solid rgba(10,51,39,.25);background:#fffdf7;color:#0A3327;border-radius:999px;padding:8px 14px;font:600 13px/1 Inter,system-ui,sans-serif;box-shadow:0 6px 18px rgba(10,51,39,.18);cursor:pointer;min-height:40px}
+@media(min-width:1100px){#versionFab{display:none}}
 </style>
 </head>
 <body>
@@ -1499,7 +1504,7 @@ main#viewContainer::-webkit-scrollbar-thumb{background:rgba(10,51,39,0.18);borde
           <div class="ep-card-meta" id="epNcoMeta">Built from what the student already does</div>
         </div>
       </div>
-      <div class="ep-stage-card" data-stage="3" data-act="ep-nav" data-v="pathway" role="button" tabindex="0">
+      <div class="ep-stage-card" data-stage="3" data-act="ep-nav" data-v="parent" role="button" tabindex="0">
         <div class="ep-card-num">03</div>
         <div>
           <div class="ep-card-title">Parent Voice Notes &amp; Schemes</div>
@@ -1643,6 +1648,10 @@ main#viewContainer::-webkit-scrollbar-thumb{background:rgba(10,51,39,0.18);borde
           <button data-v="pathway">
             <svg viewBox="0 0 24 24"><path d="M3 5 9 3l6 2 6-2v16l-6 2-6-2-6 2zM9 3v16m6-14v16"/></svg>
             <span>Path</span>
+          </button>
+          <button data-v="parent">
+            <svg viewBox="0 0 24 24"><circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 2.7-6 6-6s6 2.5 6 6M13.5 20c.3-2.6 1.8-4.5 3.5-4.5s3.5 1.9 3.5 4.5"/></svg>
+            <span>Parent</span>
           </button>
           <button data-v="facilitator">
             <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2c0-3 3-5 7-5s7 2 7 5v2m2-13a4 4 0 0 1 0 8m2 1c2 1 3 2 3 4v1"/></svg>

@@ -127,6 +127,8 @@
     const pb = document.getElementById('profileHeaderBtn'); if (pb && u && u.role !== 'teacher') pb.style.display = '';
     const fac = document.querySelector('.app-navbar [data-v="facilitator"]');
     if (fac) fac.style.display = (u && u.role === 'teacher') ? '' : 'none';
+    const par = document.querySelector('.app-navbar [data-v="parent"]');
+    if (par) par.style.display = (u && u.role === 'teacher') ? 'none' : '';
     const nav = document.getElementById('appNavbar'); if (nav && (!u || u.role === 'teacher' || S.view === 'login')) nav.style.display = 'none';
     snapshot();
   };
