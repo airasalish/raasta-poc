@@ -15,7 +15,7 @@ const FIELDS = {
   family_income_lakh: 'number in lakh rupees per year, e.g. 0.8, 2, 3.5, 6',
   marks_percent: 'number 0-100 (latest exam)'
 };
-const TAGS = ['stitching', 'drawing', 'computers', 'phone_repair', 'farming', 'cooking', 'performing_arts', 'sports', 'electrical'];
+const TAGS = ['stitching', 'drawing', 'computers', 'phone_repair', 'farming', 'cooking', 'performing_arts', 'sports', 'electrical', 'driving', 'beauty', 'accounts', 'care', 'animals'];
 
 function clean(updates) {
   const out = {};
@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
   const extractSystem =
 `Extract facts from a student's answer. The question was: "${lastQ ? lastQ.content : ''}". The answer may be in any Indian language or a speech transcript.
 Return ONLY a JSON object: {"updates":{"<field>":{"value":<value>,"quote":"<exact words from the answer that state it>"}},"skills":[...]}
-updates: include a field ONLY if the answer explicitly states it, or it is a direct short answer to the question (e.g. question about income, answer "4" -> family_income_lakh 4); never guess. Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if the student says they DO or ENJOY it, with the quote (e.g. sewing = stitching, dance or singing = performing_arts, football or kabaddi = sports, fixing fans or wiring = electrical). Never for "I don't like ...". Same format: {"value":[...],"quote":"..."}.
+updates: include a field ONLY if the answer explicitly states it, or it is a direct short answer to the question (e.g. question about income, answer "4" -> family_income_lakh 4); never guess. Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if the student says they DO or ENJOY it, with the quote (e.g. sewing = stitching, dance or singing = performing_arts, football or kabaddi = sports, fixing fans or wiring = electrical, driving tractor/auto/bike = driving, mehendi/hair/make-up = beauty, shop money/billing = accounts, looking after sick or elderly = care, raising cows/goats/hens/birds = animals). Never for "I don't like ...". Same format: {"value":[...],"quote":"..."}.
 skills: abilities, interests or experiences shown in the answer, as short English labels (e.g. "Dance", "Teaching children", "Shop accounts"). [] if none.`;
 
   const call = (messages, max) => fetch('https://api.sarvam.ai/v1/chat/completions', {

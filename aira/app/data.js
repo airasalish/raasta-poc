@@ -276,3 +276,32 @@ OPPORTUNITIES.forEach(o => {
   if (x) { o.name_i18n = o.name_i18n || {}; o.name_i18n.ta = x[0]; o.benefit_i18n = o.benefit_i18n || {}; o.benefit_i18n.ta = x[1]; }
   o.rules.forEach(r => { if (TA_ADDITIONS.rules[r.t]) r.ta = TA_ADDITIONS.rules[r.t]; });
 });
+
+// ---- More skill families (23 Nov): official sites only, no salary or eligibility claims ----
+CAREERS.push(
+  { id: "driver", type: "vocational", tags: ["driving"], min_edu: ["c9_10", "c11_12", "passed12", "dropout", "iti_diploma", "ug"],
+    title: { en: "Driver (light vehicles, delivery, transport)", ta: "ஓட்டுநர் (இலகு வாகனம், டெலிவரி, போக்குவரத்து)", hi: "ड्राइवर (हल्के वाहन, डिलीवरी, परिवहन)", ml: "ഡ്രൈവർ (ലൈറ്റ് വാഹനം, ഡെലിവറി, ഗതാഗതം)" },
+    why: "Driving a tractor, auto or bike carefully is a skill that transport and delivery work needs.",
+    why_i18n: { ta: "டிராக்டர், ஆட்டோ, பைக் கவனமாக ஓட்டுவது போக்குவரத்து, டெலிவரி வேலைகளுக்குத் தேவையான திறன்.", hi: "ट्रैक्टर, ऑटो या बाइक सावधानी से चलाना परिवहन और डिलीवरी के काम में ज़रूरी हुनर है।", ml: "ട്രാക്ടർ, ഓട്ടോ, ബൈക്ക് ശ്രദ്ധയോടെ ഓടിക്കുന്നത് ഗതാഗത, ഡെലിവറി ജോലികൾക്ക് വേണ്ട കഴിവാണ്." },
+    earn: "", path: [["Find a driver training course", "Skill India Digital", "https://www.skillindiadigital.gov.in"], ["Apply for your driving licence (when you reach the legal age)", "Parivahan Sewa", "https://parivahan.gov.in"]], exams: ["Driving licence test"] },
+  { id: "beautician", type: "vocational", tags: ["beauty"], min_edu: ["c9_10", "c11_12", "passed12", "dropout", "iti_diploma", "ug"],
+    title: { en: "Beautician / Beauty Therapist", ta: "அழகுக்கலை நிபுணர்", hi: "ब्यूटीशियन / ब्यूटी थेरेपिस्ट", ml: "ബ്യൂട്ടീഷ്യൻ / ബ്യൂട്ടി തെറാപ്പിസ്റ്റ്" },
+    why: "Doing mehendi, hair or make-up for weddings and festivals is a real skill; certified beauty courses build on it.",
+    why_i18n: { ta: "திருமணம், விழாக்களுக்கு மருதாணி, சிகை அலங்காரம், ஒப்பனை செய்வது உண்மையான திறன்; சான்றிதழ் படிப்புகள் அதை வளர்க்கும்.", hi: "शादी-त्योहारों में मेहंदी, बाल या मेकअप करना असली हुनर है; प्रमाणित ब्यूटी कोर्स इसे आगे बढ़ाते हैं।", ml: "കല്യാണങ്ങൾക്കും ഉത്സവങ്ങൾക്കും മൈലാഞ്ചി, മുടി, മേക്കപ്പ് ചെയ്യുന്നത് യഥാർത്ഥ കഴിവാണ്; സർട്ടിഫൈഡ് കോഴ്സുകൾ അത് വളർത്തും." },
+    earn: "", path: [["Find a beauty & wellness course", "Skill India Digital", "https://www.skillindiadigital.gov.in"]], exams: ["None"] },
+  { id: "accounts_assistant", type: "professional", tags: ["accounts", "computers"], min_edu: ["c11_12", "passed12", "ug", "iti_diploma"],
+    title: { en: "Accounts / Billing Assistant", ta: "கணக்கு / பில்லிங் உதவியாளர்", hi: "अकाउंट्स / बिलिंग सहायक", ml: "അക്കൗണ്ട്സ് / ബില്ലിങ് അസിസ്റ്റന്റ്" },
+    why: "Handling money, bills or stock in a family shop is real accounting skill.",
+    why_i18n: { ta: "குடும்பக் கடையில் பணம், பில், சரக்கு கையாள்வது உண்மையான கணக்குத் திறன்.", hi: "परिवार की दुकान में पैसे, बिल या सामान सँभालना असली हिसाब-किताब का हुनर है।", ml: "കുടുംബക്കടയിൽ പണം, ബിൽ, സ്റ്റോക്ക് കൈകാര്യം ചെയ്യുന്നത് യഥാർത്ഥ അക്കൗണ്ടിങ് കഴിവാണ്." },
+    earn: "", path: [["Study commerce / accountancy (open schooling is possible)", "NIOS", "https://www.nios.ac.in"], ["Find a short accounting course", "Skill India Digital", "https://www.skillindiadigital.gov.in"]], exams: ["Class 12 Commerce (any board)"] },
+  { id: "health_assistant", type: "vocational", tags: ["care"], min_edu: ["c11_12", "passed12", "ug", "iti_diploma"],
+    title: { en: "Healthcare Assistant", ta: "சுகாதார உதவியாளர்", hi: "स्वास्थ्य सहायक", ml: "ആരോഗ്യ സഹായി" },
+    why: "Looking after elderly or sick family members shows patience and care; healthcare assistant courses train it.",
+    why_i18n: { ta: "வயதானவர்கள் அல்லது நோயுற்றவர்களைக் கவனிப்பது பொறுமையும் அக்கறையும்; சுகாதார உதவியாளர் படிப்புகள் அதைப் பயிற்றுவிக்கும்.", hi: "बुज़ुर्गों या बीमारों की देखभाल धैर्य और सेवा दिखाती है; स्वास्थ्य सहायक कोर्स इसे सिखाते हैं।", ml: "പ്രായമായവരെയോ രോഗികളെയോ പരിചരിക്കുന്നത് ക്ഷമയും കരുതലുമാണ്; ആരോഗ്യ സഹായി കോഴ്സുകൾ അത് പരിശീലിപ്പിക്കും." },
+    earn: "", path: [["Find a healthcare assistant course", "Skill India Digital", "https://www.skillindiadigital.gov.in"]], exams: ["Check the course's entry requirement"] },
+  { id: "animal_care", type: "vocational", tags: ["animals", "farming"], min_edu: ["c9_10", "c11_12", "passed12", "dropout", "iti_diploma"],
+    title: { en: "Dairy & Animal Care", ta: "பால்பண்ணை & கால்நடைப் பராமரிப்பு", hi: "डेयरी और पशुपालन", ml: "ഡെയറി & മൃഗപരിപാലനം" },
+    why: "Raising cows, goats, hens or birds is real animal-care skill that dairy and poultry work builds on.",
+    why_i18n: { ta: "மாடு, ஆடு, கோழி, பறவைகள் வளர்ப்பது உண்மையான கால்நடைத் திறன்; பால்பண்ணை, கோழிப்பண்ணை வேலைகள் அதில் வளரும்.", hi: "गाय, बकरी, मुर्गी या पक्षी पालना असली पशुपालन हुनर है जिस पर डेयरी और पोल्ट्री का काम टिका है।", ml: "പശു, ആട്, കോഴി, പക്ഷികളെ വളർത്തുന്നത് യഥാർത്ഥ മൃഗപരിപാലന കഴിവാണ്; ഡെയറി, പൗൾട്രി ജോലികൾ അതിൽ വളരും." },
+    earn: "", path: [["Find a dairy or poultry course", "Skill India Digital", "https://www.skillindiadigital.gov.in"], ["Government animal husbandry schemes", "Dept. of Animal Husbandry & Dairying", "https://dahd.gov.in"]], exams: ["None"] }
+);
