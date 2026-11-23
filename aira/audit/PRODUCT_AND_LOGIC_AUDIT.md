@@ -7,6 +7,37 @@
 
 ---
 
+## Status update (23 Nov 2026, second pass)
+
+Most findings below are now fixed and live; see [CHANGELOG.md](CHANGELOG.md) for commits and how each was tested.
+
+| Finding | Status |
+|---|---|
+| C-1 invented interests | ✅ Fixed (`30feaf7`) |
+| C-2 facts asked once then lost | ✅ Fixed: re-ask once in simpler words, then move on; refusals respected (`cfa7f93`) |
+| C-3 silent overwrite of changed answers | ⏳ Open (P2): the change is applied correctly but not logged or read back |
+| C-4 silent fallback to tapping | ✅ Fixed (`cfa7f93`) |
+| C-5 fixed fact order | ⏳ Open (P2) |
+| C-6 conversation.json not loaded | ⛔ Needs Nandana |
+| G-1 skills don't reach matching | ✅ Fixed (`30feaf7`, `29c74e2`) |
+| G-2 English skill labels | ⏳ Open (needs a model change) |
+| G-3 / G-4 skill confidence, explicit "declined" | 🟡 Partly: declined facts are tracked in `asked` / `retried` |
+| M-1 order bias · M-2 unknown education | ✅ Fixed (`30feaf7`) |
+| M-3 catalogue gaps | ✅ 17 careers now cover 9 new skill families (`30feaf7`, `29c74e2`) |
+| M-4 grounded explanations | ⏳ Open (P1): reasons are still fixed sentences per career |
+| M-5 unsourced salaries | ✅ Hidden on screen (`875bedc`); the data field is kept for the contract |
+| M-6 vocational fairness for graduates | ⏳ Open (P2) |
+| R-1 percentile label | ✅ Fixed (`30feaf7`) |
+| R-2 / R-3 / R-4 verification, deadlines, deep links | ⛔ Needs a person to verify official pages |
+| R-6 "maybe" without a next step | ✅ Fixed (`875bedc`) |
+| T-1 Tamil fallback to English | ✅ Fixed across every screen (`30feaf7`, `c28f4c2`) |
+| T-2 two API contracts | ⛔ Needs Gautam |
+| T-3 no JS tests | ✅ 52 tests (`run-all.js`) |
+| T-4 no server rate limit | ✅ Fixed (`01b86dc`) |
+| T-5 … T-8 | ⏳ Open (P2/P3) |
+
+---
+
 ## 1. Existing architecture
 
 ```
