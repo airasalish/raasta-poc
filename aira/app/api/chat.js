@@ -106,7 +106,15 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
       : stage === 'fact'
         ? `Briefly thank them for the answer (one short phrase). Then ask ONLY this, nothing else: ${ASK[next]}. Do NOT ask about hobbies, interests, sports or skills again.`
         : `Thank them warmly in one sentence and tell them their career routes are ready to see. Do NOT ask any question.`;
-    const replyText = await call([{ role: 'system', content: base + '\n' + task }, ...history], 200);
+    const FINISH = {
+      English: 'Thank you for sharing all this with me. Your career routes are ready, tap below to see them.',
+      Tamil: 'இவை அனைத்தையும் பகிர்ந்ததற்கு நன்றி. உங்கள் தொழில் வழிகள் தயார், கீழே தொட்டுப் பாருங்கள்.',
+      Hindi: 'यह सब बताने के लिए धन्यवाद। आपके करियर के रास्ते तैयार हैं, नीचे दबाकर देखें।',
+      Malayalam: 'ഇതെല്ലാം പങ്കുവെച്ചതിന് നന്ദി. നിങ്ങളുടെ കരിയർ വഴികൾ തയ്യാറാണ്, താഴെ തൊട്ട് കാണൂ.'
+    };
+    // Fact questions only see the last exchange, so the model can't drift back to hobbies.
+    const replyText = stage === 'finish' ? FINISH[lang] || FINISH.English
+      : await call([{ role: 'system', content: base + '\n' + task }, ...(stage === 'fact' ? history.slice(-2) : history)], 200);
     const reply = replyText.replace(/^["'`]+|["'`]+$/g, '').slice(0, 500);
     if (!reply) return send(res, 502, { error: 'no reply' });
     return send(res, 200, {
