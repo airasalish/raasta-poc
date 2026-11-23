@@ -31,7 +31,7 @@
   };
   const canShow = (key) => { let demo = false; try { demo = sessionStorage.getItem('raasta_demo_mode') === '1'; } catch {} return !!cfg[key] && !seen[key] && !demo; };
   const show = (key) => {
-    if (!canShow(key)) return;
+    if (!canShow(key) || current === key) return; // already open: re-showing restarted the fade-in forever
     current = key;
     lastFocused = document.activeElement;
     const c = cfg[key], l = labels[lang()] || labels.en;
