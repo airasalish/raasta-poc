@@ -18,6 +18,18 @@ function allowedOrigin(req) {
   } catch (e) { return false; }
 }
 
+// Best-effort per-IP limit (per server instance) so one client can't drain the Sarvam credits.
+// Default 40 calls per minute; override with RATE_PER_MIN in Vercel env.
+const hits = new Map();
+function tooMany(req, now = Date.now()) {
+  const limit = parseInt(process.env.RATE_PER_MIN, 10) || 40;
+  const ip = String((req.headers && (req.headers['x-forwarded-for'] || req.headers['x-real-ip'])) || (req.socket && req.socket.remoteAddress) || 'unknown').split(',')[0].trim();
+  const list = (hits.get(ip) || []).filter(t => now - t < 60000);
+  list.push(now); hits.set(ip, list);
+  if (hits.size > 5000) hits.clear();
+  return list.length > limit;
+}
+
 function send(res, status, obj) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json');
@@ -38,4 +50,4 @@ function readRaw(req, limit) {
   });
 }
 
-module.exports = { LOCALES, key, allowedOrigin, send, readRaw };
+module.exports = { LOCALES, key, allowedOrigin, tooMany, send, readRaw };

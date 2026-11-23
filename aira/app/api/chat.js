@@ -1,4 +1,4 @@
-const { key, allowedOrigin, send, readRaw } = require('./_sarvam');
+const { key, allowedOrigin, send, readRaw, tooMany } = require('./_sarvam');
 
 // Adaptive conversation turn.
 // POST { lang, history:[{role:'user'|'assistant', content}], profile, skills:[...] }
@@ -56,6 +56,7 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   if (!key()) return send(res, 503, { error: 'Sarvam not configured' });
   if (!allowedOrigin(req)) return send(res, 403, { error: 'forbidden' });
+  if (tooMany(req)) return send(res, 429, { error: 'too many requests' });
   let b;
   try { b = typeof req.body === 'object' && req.body ? req.body : JSON.parse((await readRaw(req, 60000)).toString('utf8') || '{}'); }
   catch (e) { return send(res, 400, { error: 'bad json' }); }

@@ -1,10 +1,11 @@
-const { LOCALES, key, allowedOrigin, send, readRaw } = require('./_sarvam');
+const { LOCALES, key, allowedOrigin, send, readRaw, tooMany } = require('./_sarvam');
 
 // POST { text, lang } -> { audio: <base64 wav> }
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   if (!key()) return send(res, 503, { error: 'Sarvam not configured' });
   if (!allowedOrigin(req)) return send(res, 403, { error: 'forbidden' });
+  if (tooMany(req)) return send(res, 429, { error: 'too many requests' });
   let body;
   try {
     body = typeof req.body === 'object' && req.body ? req.body : JSON.parse((await readRaw(req, 20000)).toString('utf8') || '{}');

@@ -1,10 +1,11 @@
-const { LOCALES, key, allowedOrigin, send, readRaw } = require('./_sarvam');
+const { LOCALES, key, allowedOrigin, send, readRaw, tooMany } = require('./_sarvam');
 
 // POST raw audio (webm/ogg/mp4/wav) with ?lang=ta-IN -> { transcript }
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   if (!key()) return send(res, 503, { error: 'Sarvam not configured' });
   if (!allowedOrigin(req)) return send(res, 403, { error: 'forbidden' });
+  if (tooMany(req)) return send(res, 429, { error: 'too many requests' });
   const url = new URL(req.url, 'http://x');
   const lang = LOCALES.has(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'unknown';
   const type = String(req.headers['content-type'] || 'audio/webm').split(';')[0];
