@@ -5,13 +5,16 @@ const { key, allowedOrigin, send, readRaw } = require('./_sarvam');
 // not only from the fixed catalogue. Links are limited to trusted public sites.
 const LANG = { 'ta-IN': 'Tamil', 'en-IN': 'English', 'hi-IN': 'Hindi', 'ml-IN': 'Malayalam' };
 const RESOURCES = {
-  swayam: ['SWAYAM free courses', 'https://swayam.gov.in'],
-  ncs: ['National Career Service', 'https://www.ncs.gov.in'],
-  skillindia: ['Skill India Digital (free skill courses)', 'https://www.skillindiadigital.gov.in'],
-  apprenticeship: ['Apprenticeship India', 'https://www.apprenticeshipindia.gov.in'],
-  diksha: ['DIKSHA learning app', 'https://diksha.gov.in'],
-  nsp: ['National Scholarship Portal', 'https://scholarships.gov.in'],
-  tnskill: ['TN Skill Training', 'https://skilltraining.tn.gov.in'],
+  swayam: ['SWAYAM', 'swayam.gov.in'],
+  nptel: ['NPTEL', 'nptel.ac.in'],
+  ncs: ['National Career Service', 'ncs.gov.in'],
+  skillindia: ['Skill India Digital', 'skillindiadigital.gov.in'],
+  apprenticeship: ['Apprenticeship India', 'apprenticeshipindia.gov.in'],
+  diksha: ['DIKSHA', 'diksha.gov.in'],
+  nsp: ['National Scholarship Portal', 'scholarships.gov.in'],
+  tnskill: ['TN Skill Training', 'skilltraining.tn.gov.in'],
+  ignou: ['IGNOU', 'ignou.ac.in'],
+  nios: ['NIOS', 'nios.ac.in'],
   none: ['', '']
 };
 const TYPES = ['vocational', 'professional', 'emerging', 'govt'];
@@ -33,7 +36,7 @@ module.exports = async (req, res) => {
   const system =
 `Suggest 3 realistic career routes in India for a rural student (${who}) whose skills and interests are: ${skills.join(', ')}.
 Routes must come DIRECTLY from these skills (e.g. singing -> playback/devotional singer, music teacher, sound/recording assistant). Mix one vocational or low-cost route, one study route, and one emerging route. No salary numbers, no promises.
-Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","type":"vocational|professional|emerging|govt","why":"<one sentence in ${lang} linking to their skill>","steps":[{"step":"<short first step in ${lang}>","resource":"swayam|ncs|skillindia|apprenticeship|diksha|nsp|tnskill|none"}, 4 steps total],"exams":["<real course/exam/certificate names, English>"]}]}`;
+Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","type":"vocational|professional|emerging|govt","why":"<one sentence in ${lang} linking to their skill>","steps":[{"step":"<short step in ${lang}>","course":"<a SPECIFIC real course, certificate or programme name in English, e.g. Certificate in Carnatic Music, Sound Recording Assistant (QP), or empty>","site":"swayam|nptel|skillindia|apprenticeship|ncs|diksha|ignou|nios|tnskill|none"}, 4 steps total],"exams":["<real course/exam/certificate names, English>"]}]}`;
 
   try {
     const r = await fetch('https://api.sarvam.ai/v1/chat/completions', {
@@ -58,7 +61,7 @@ Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","type":"vocation
       type: TYPES.includes(x.type) ? x.type : 'emerging',
       why: String(x.why || '').slice(0, 240),
       earn: '',
-      path: (Array.isArray(x.steps) ? x.steps : []).slice(0, 4).map(s => { const rsc = RESOURCES[s && s.resource] || RESOURCES.none; return [String(s && s.step || '').slice(0, 120), rsc[0], rsc[1]]; }).filter(s => s[0]),
+      path: (Array.isArray(x.steps) ? x.steps : []).slice(0, 4).map(s => { const rsc = RESOURCES[s && s.site] || RESOURCES.none; const course = String(s && s.course || '').replace(/[<>]/g, '').slice(0, 80).trim(); const url = rsc[1] ? 'https://www.google.com/search?q=' + encodeURIComponent((course || '') + ' site:' + rsc[1]) : ''; return [String(s && s.step || '').slice(0, 120), course ? course + ' · ' + rsc[0] : rsc[0], url]; }).filter(s => s[0]),
       exams: (Array.isArray(x.exams) ? x.exams : []).slice(0, 4).map(e => String(e).slice(0, 60)),
       ai: true
     })).filter(x => x.title && x.path.length);
