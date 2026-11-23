@@ -87,5 +87,15 @@ const Q = { role: 'assistant', content: 'What do you enjoy doing?' };
     const r = await run({ lang: 'en-IN', history: [Q, { role: 'user', content: 'hi' }], profile: {}, skills: [] });
     assert.strictEqual(r.status, 502);
   });
+  await ok('money the student earns is not taken as family income', async () => {
+    mockSarvam({ updates: { family_income_lakh: { value: 0.6, quote: 'fifty rupees for each blouse' } }, skills: ['Stitching'] });
+    const r = await run({ lang: 'en-IN', history: [Q, { role: 'user', content: 'The aunties pay me fifty rupees for each blouse.' }], profile: {}, skills: [] });
+    assert.strictEqual(r.body.updates.family_income_lakh, undefined);
+  });
+  await ok('family income is kept when asked for', async () => {
+    mockSarvam({ updates: { family_income_lakh: { value: 2, quote: 'around 2' } }, skills: [] });
+    const r = await run({ lang: 'en-IN', history: [{ role: 'assistant', content: 'How much does your family earn in a year?' }, { role: 'user', content: 'around 2' }], profile: {}, skills: [], asked: ['family_income_lakh'], lastAsking: 'family_income_lakh' });
+    assert.strictEqual(r.body.updates.family_income_lakh, 2);
+  });
   console.log(n + ' tests passed');
 })().catch(e => { console.error(e); process.exit(1); });

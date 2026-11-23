@@ -33,6 +33,8 @@ function clean(updates) {
 // Student declines or can't answer: move on, never nag.
 const REFUSE = /don'?t want|do not want|rather not|prefer not|\bskip\b|no idea|not sure|don'?t know|do not know|வேண்டாம்|தெரியாது|விருப்பமில்லை|नहीं पता|नहीं बताना|मत पूछ|छोड़|അറിയില്ല|വേണ്ട|പറയാൻ താല്പര്യമില്ല/i;
 
+const INCOME_WORDS = /lakh|lac|per year|a year|annual|yearly|income|family earn|parents earn|லட்ச|வருட|வருமான|लाख|सालाना|आय|आमदनी|ലക്ഷ|വർഷ|വരുമാന/i;
+
 // Decide the next step in code, not in the model.
 //   discover: talk about skills (first turns) -> fact: ask one missing fact -> finish.
 // A fact that was asked but not caught is asked ONCE more in simpler words, unless the student declined.
@@ -112,6 +114,8 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
       }
     }
     const updates = clean(raw);
+    // Money the student earns ("₹50 a blouse") is not family income: keep income only when it was asked or clearly stated.
+    if (updates.family_income_lakh !== undefined && lastAsking !== 'family_income_lakh' && !INCOME_WORDS.test(answer)) delete updates.family_income_lakh;
     const newSkills = (Array.isArray(ex.skills) ? ex.skills : []).map(s => String(s).slice(0, 40)).filter(Boolean).slice(0, 5);
     const allSkills = [...new Set([...skills, ...newSkills])];
     const userTurns = history.filter(m => m.role === 'user').length;
