@@ -30,6 +30,28 @@ function clean(updates) {
   return out;
 }
 
+// Student declines or can't answer: move on, never nag.
+const REFUSE = /don'?t want|do not want|rather not|prefer not|\bskip\b|no idea|not sure|don'?t know|do not know|வேண்டாம்|தெரியாது|விருப்பமில்லை|नहीं पता|नहीं बताना|मत पूछ|छोड़|അറിയില്ല|വേണ്ട|പറയാൻ താല്പര്യമില്ല/i;
+
+// Decide the next step in code, not in the model.
+//   discover: talk about skills (first turns) -> fact: ask one missing fact -> finish.
+// A fact that was asked but not caught is asked ONCE more in simpler words, unless the student declined.
+function decide({ known, updates, asked, retried, lastAsking, answer, userTurns }) {
+  const nowKnown = Object.keys(FIELDS).filter(k => known.includes(k) || updates[k] !== undefined);
+  let retry = null, declined = null;
+  if (lastAsking && FIELDS[lastAsking] !== undefined && !nowKnown.includes(lastAsking)) {
+    if (REFUSE.test(answer) || retried.includes(lastAsking)) declined = lastAsking;
+    else retry = lastAsking;
+  }
+  const toAsk = Object.keys(FIELDS).filter(k => !nowKnown.includes(k) && !asked.includes(k) && k !== lastAsking);
+  const factsStarted = asked.length > 0 || known.length > 0 || !!lastAsking;
+  if (!factsStarted && userTurns < 3) return { stage: 'discover', next: null, retry: false, declined };
+  if (userTurns >= 12) return { stage: 'finish', next: null, retry: false, declined };
+  if (retry) return { stage: 'fact', next: retry, retry: true, declined };
+  if (toAsk.length) return { stage: 'fact', next: toAsk[0], retry: false, declined };
+  return { stage: 'finish', next: null, retry: false, declined };
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   if (!key()) return send(res, 503, { error: 'Sarvam not configured' });
@@ -52,6 +74,8 @@ module.exports = async (req, res) => {
   const answer = history[history.length - 1].content;
   // Fields already asked once: if the student skipped them, we move on instead of asking again.
   const asked = (Array.isArray(b.asked) ? b.asked : []).filter(k => k in FIELDS);
+  const retried = (Array.isArray(b.retried) ? b.retried : []).filter(k => k in FIELDS);
+  const lastAsking = typeof b.lastAsking === 'string' && b.lastAsking in FIELDS ? b.lastAsking : null;
   const ASK = {
     age: 'how old they are',
     education: 'which class they are in now, or the last class they finished',
@@ -89,22 +113,18 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
     const updates = clean(raw);
     const newSkills = (Array.isArray(ex.skills) ? ex.skills : []).map(s => String(s).slice(0, 40)).filter(Boolean).slice(0, 5);
     const allSkills = [...new Set([...skills, ...newSkills])];
-    const nowKnown = Object.keys(FIELDS).filter(k => known.includes(k) || updates[k] !== undefined);
-    const toAsk = Object.keys(FIELDS).filter(k => !nowKnown.includes(k) && !asked.includes(k));
     const userTurns = history.filter(m => m.role === 'user').length;
 
-    // 2) Decide the stage in code, not in the model: discover skills, then facts one by one, then finish.
-    const factsStarted = asked.length > 0 || known.length > 0;
-    let stage, next = null;
-    if (!factsStarted && userTurns < 3) stage = 'discover';
-    else if (toAsk.length && userTurns < 12) { stage = 'fact'; next = toAsk[0]; }
-    else stage = 'finish';
+    // 2) Decide the stage in code, not in the model.
+    const { stage, next, retry, declined } = decide({ known, updates, asked, retried, lastAsking, answer, userTurns });
 
     const base = `You are Raahi, a warm career guide for rural Indian students. Reply ONLY in ${lang}, plain text, max 2 short sentences, simple words a 15-year-old understands (it is read aloud). Never promise jobs, money or scholarships. Never invent facts. Never say "you already told me".`;
     const task = stage === 'discover'
       ? `Acknowledge exactly what they said, then ask ONE follow-up question about their skills or interests (how they learned it, who they do it for, have they taught it or earned from it). If they say "I don't know", ask about a normal day or what people ask their help with. Skills noticed so far: ${allSkills.join(', ') || 'none'}.`
       : stage === 'fact'
-        ? `Briefly thank them for the answer (one short phrase). Then ask ONLY this, nothing else: ${ASK[next]}. Do NOT ask about hobbies, interests, sports or skills again.`
+        ? (retry
+          ? `The student did not answer the last question clearly. Kindly ask it again in simpler words, give one example answer, and say it is fine to skip. Ask ONLY this: ${ASK[next]}.`
+          : `Briefly thank them for the answer (one short phrase). Then ask ONLY this, nothing else: ${ASK[next]}. Do NOT ask about hobbies, interests, sports or skills again.`)
         : `Thank them warmly in one sentence and tell them their career routes are ready to see. Do NOT ask any question.`;
     const FINISH = {
       English: 'Thank you for sharing all this with me. Your career routes are ready, tap below to see them.',
@@ -123,9 +143,13 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
       skills: newSkills,
       suggestions: [],
       asking: next,
+      retry,
+      declined,
       done: stage === 'finish'
     });
   } catch (e) {
     return send(res, 502, { error: 'sarvam unreachable', detail: String(e.message || e).slice(0, 200) });
   }
 };
+module.exports.decide = decide;
+module.exports.clean = clean;
