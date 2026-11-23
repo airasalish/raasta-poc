@@ -60,4 +60,8 @@ ok('live demo student Meena is named in Tamil, Hindi and Malayalam', () => {
   const c = career('textile_design_digital');
   for (const [lang, name] of [['ta', 'மீனா'], ['hi', 'मीना'], ['ml', 'മീന']]) assert(parentNoteFor({ ...KAVYA, name: 'Meena' }, c, lang, STEP_I18N).text.includes(name), lang);
 });
+ok('a name typed in lower case still gets its local spelling', () => {
+  const c = career('textile_design_digital');
+  for (const [lang, name] of [['ta', 'ஐரா'], ['hi', 'आइरा'], ['ml', 'ഐറ']]) assert(parentNoteFor({ ...KAVYA, name: 'aira' }, c, lang, STEP_I18N).text.includes(name), lang);
+});
 console.log(n + ' tests passed');

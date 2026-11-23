@@ -189,14 +189,18 @@ if (!PARENT_T.ml) PARENT_T.ml = {
 };
 if (PARENT_MAX_WORDS.hi === undefined) PARENT_MAX_WORDS.hi = 140; // ESTIMATE, like Nandana's: time a real playback
 if (PARENT_MAX_WORDS.ml === undefined) PARENT_MAX_WORDS.ml = 100; // Malayalam joins words, so fewer per minute
-if (PARENT_TA.names && !PARENT_TA.names.Meena) PARENT_TA.names.Meena = "மீனா"; // live demo student
+if (PARENT_TA.names) { if (!PARENT_TA.names.Meena) PARENT_TA.names.Meena = "மீனா"; if (!PARENT_TA.names.Aira) PARENT_TA.names.Aira = "ஐரா"; } // live demo students
 const PARENT_NAMES_I18N = {
-  hi: { Meena: "मीना", Kavya: "काव्या", Murugan: "मुरुगन", Divya: "दिव्या", Selvam: "सेल्वम", Anitha: "अनीता" },
-  ml: { Meena: "മീന", Kavya: "കാവ്യ", Murugan: "മുരുഗൻ", Divya: "ദിവ്യ", Selvam: "സെൽവം", Anitha: "അനിത" }
+  hi: { Aira: "आइरा", Meena: "मीना", Kavya: "काव्या", Murugan: "मुरुगन", Divya: "दिव्या", Selvam: "सेल्वम", Anitha: "अनीता" },
+  ml: { Aira: "ഐറ", Meena: "മീന", Kavya: "കാവ്യ", Murugan: "മുരുഗൻ", Divya: "ദിവ്യ", Selvam: "സെൽവം", Anitha: "അനിത" }
 };
 function parentNoteFor(profile, career, lang, stepI18n) {
   if (typeof buildParentScript !== "function" || !PARENT_T[lang] || !career || !career.title) return null;
   if (!profile || !profile.name) return null;
+  { // "aira" or "AIRA" typed at sign-up: match the known spelling so the Tamil/Hindi/Malayalam name is used
+    const raw = String(profile.name).trim(), key = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+    if (key !== raw && ((PARENT_TA.names && PARENT_TA.names[key]) || PARENT_NAMES_I18N.hi[key])) profile = Object.assign({}, profile, { name: key });
+  }
   const title = typeof career.title === "string" ? { en: career.title, [lang]: career.title } : career.title;
   const path = Array.isArray(career.path) ? career.path : [];
   const first = path[0] && path[0][0];
