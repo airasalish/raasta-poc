@@ -1,43 +1,125 @@
-# Raasta: Proof of Concept
+<div align="center">
 
-**Team Absolute Zero · SRM Institute of Science and Technology, Chennai · Citi India Hackathon (Ada Lovelace Day), Round 2**
+<img src="aira/app/raasta-icon-192.png" width="88" alt="Raasta icon">
 
-"Google Maps for careers" for rural India. A student talks in her own language, and Raasta shows careers that fit her, scholarships she actually qualifies for (with official sources), a week-by-week pathway, a voice note for her parents, and a teacher dashboard. It works on a cheap phone, even offline.
+# Raasta · ராஸ்தா
+
+### Google Maps for careers, for rural India.
+
+A student **talks in her own language**. Raasta works out what she is already good at, shows **career routes that grow from those skills**, checks **which scholarships she may qualify for, rule by rule, with official sources**, builds a **week-by-week pathway**, and gives her family a **voice note** they can understand.
+
+**[▶ Open the live app](https://raasta-poc.vercel.app)** &nbsp;·&nbsp; Tamil · English · हिंदी · മലയാളം &nbsp;·&nbsp; Works offline
+
+![Languages](https://img.shields.io/badge/languages-Tamil%20%C2%B7%20English%20%C2%B7%20Hindi%20%C2%B7%20Malayalam-176f50)
+![PWA](https://img.shields.io/badge/PWA-offline%20ready-123d2e)
+![Voice](https://img.shields.io/badge/voice-Sarvam%20AI-bd8132)
+![Tests](https://img.shields.io/badge/tests-52%20passing-176f50)
+![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%C2%B7%20Vercel-18251e)
+
+*Team Absolute Zero · SRM Institute of Science and Technology, Chennai · Citi India Hackathon (Ada Lovelace Day), Round 2*
+
+</div>
 
 ---
 
-## How this repo works
+## The problem
 
-**Everyone works ONLY inside their own folder.** Nobody edits anyone else's folder or `shared/`. At the end (Sat 21 Nov), we compile everything into `final/`.
+A 17-year-old in Villupuram stitches clothes for her neighbours. She has never thought of it as a *skill*. Nobody has told her that it can lead to an ITI course, a garment-unit apprenticeship with a stipend, or a fashion-technology diploma, and that she may qualify for support to get there.
 
-| Folder | Owner | Works on |
-|---|---|---|
-| `aira/` | Aira (Lead) | Full UI/UX of the app: every screen, the design system, polish |
-| `nandana/` | Nandana | Voice mode: the conversation (what Raasta asks and says), voice states and flow, testing |
-| `akshaj/` | Akshaj | Voice engine: BHASHINI speech-to-text and text-to-speech integration (`voice.js`) |
-| `gautam/` | Gautam | Backend (FastAPI), BHASHINI server side (`/api/stt`, `/api/tts`), helps everyone |
-| `pranshu/` | Pranshu | Roadmap: Round 3 plan, production architecture, roadmap slides |
-| `shared/prototype/` | Read-only | The working baseline prototype. **Copy it into your folder; don't edit it here.** |
-| `final/` | Aira (Sat) | The compiled app we demo on Mon 23 Nov |
+Career guidance in India is mostly in English, mostly for city students, and mostly a form that asks *"What do you want to become?"*. Raasta asks *"What do you already do?"* instead.
 
-Each folder has a `README.md` with that person's exact task, deliverables and the **interface** they must follow so compilation is easy.
+<div align="center">
+<img src="aira/screenshots/concepts-en.png" width="720" alt="Raasta interface directions: conversation and Opportunity Radar">
+</div>
 
-## How the pieces fit at the end
+## What it does
 
+| | |
+|---|---|
+| 🎙️ **Talk, don't type** | An adaptive voice conversation in Tamil, English, Hindi or Malayalam. Raasta follows what the student actually says, gently re-asks once when an answer is unclear, respects "I'd rather not say", and stops with a clear *"your roadmap is ready"*. |
+| 🧬 **Skill Genome** | Free-text skills ("dances at temple festivals", "fixes mixies for neighbours", "raises goats") are captured as the student speaks and mapped to skill families, so matching works even for answers no form would have offered. |
+| 🧭 **Your Routes** | Career routes built from the student's own skills, by AI when online and from a 17-career catalogue on the device when offline. Each route has photos and videos of real people doing the job. |
+| 📡 **Opportunity Radar** | Scholarship and training eligibility, checked rule by rule on the device: ✓ met, — not met, ? missing. A "maybe" tells you *exactly* which answer is missing. Every scheme links to its official source and is clearly labelled as unverified demo data. |
+| 🗺️ **My Pathway** | A week-by-week plan with links to official course sites (SWAYAM, Skill India Digital, NIOS, Apprenticeship India and others). |
+| 👪 **Parent Mode** | A spoken explanation for the family in their language, with a pre-recorded Tamil note for the demo. |
+| 🏫 **School view** | A teacher sees every student who used the shared school phone, by name: skills, top route, possible schemes, who needs a closer look, and who hasn't started. |
+
+## Built on honesty
+
+- **No invented facts.** Profile facts are kept only if the student's own words back them up. The model has to quote them.
+- **No guessed matches.** With no skills known, Raasta asks instead of guessing. Unknown information is never treated as failed.
+- **No made-up money.** No salary figures are shown. Scheme benefits say *"demo detail, verify"*.
+- **Every scheme is marked unverified** until a person checks it against the official page.
+
+## How it works
+
+```mermaid
+flowchart LR
+  S([Student speaks]) --> V[voice.js<br/>Sarvam STT/TTS<br/>browser fallback]
+  V --> C[/api/chat<br/>extract facts and skills with quotes<br/>stage decided in code/]
+  C --> G[(Skill Genome<br/>profile + skills)]
+  G --> E[engine.js on device<br/>eligibility + matching]
+  G --> R[/api/routes<br/>AI routes from skills/]
+  E --> UI[Routes · Radar · Pathway · Parent · School]
+  R --> UI
+  G -. saved per student .-> L[(On-device accounts)]
 ```
-final/
-  frontend/   <- Aira's UI (aira/)
-                + Akshaj's voice.js (akshaj/)
-                + Nandana's conversation script (nandana/conversation.json)
-  backend/    <- Gautam's FastAPI (gautam/backend/), including /api/stt and /api/tts
-  docs/       <- Pranshu's roadmap + architecture (pranshu/)
+
+| Layer | What it is |
+|---|---|
+| **App** | Installable PWA in plain JavaScript, no build step. Network-first service worker, so it works offline after the first visit. |
+| **Rules engine** | `engine.js` runs on the device. Every eligibility rule is JSON (`field`, `op`, `value`, `text`) with an official source link. |
+| **AI** | Sarvam AI (`sarvam-105b-conversations`) via Vercel serverless functions. The API key stays on the server, with an origin allow-list and a per-IP rate limit. |
+| **Voice** | Sarvam `saaras:v4` speech-to-text and `bulbul:v3` text-to-speech. Daily per-device budget, Stop button, falls back to the browser's own voice. |
+| **Data** | 17 careers and 7 opportunities, every string in 4 languages. |
+
+## Try it in 60 seconds
+
+1. Open **[raasta-poc.vercel.app](https://raasta-poc.vercel.app)** and pick **தமிழ்**.
+2. Tap **Presenter demo: Kavya** for the full story, or **New student** to talk to it yourself.
+3. Say something no form would expect, like *"I train pigeons"* or *"I fix fans for my neighbours"*, and watch the Skill Genome grow.
+4. Open **Radar** to see each rule checked, then **Path** for the plan and the parent voice note.
+5. **Teacher login** on the same phone shows the class.
+
+## Run locally
+
+```bash
+python -m http.server 5173 --directory aira/app      # static app (voice falls back to the browser)
+node aira/app/tests/run-all.js                         # 52 tests, no network, Sarvam is mocked
 ```
 
-**The contracts everyone must follow:**
-- **Voice (Akshaj → Aira):** `voice.js` exposes `window.RaastaVoice = { listen(lang) → Promise<text>, speak(text, lang) → Promise<void>, isOnline() }`. The UI only calls these two functions.
-- **Conversation (Nandana → Aira, Gautam):** `nandana/conversation.json` holds every question, option, follow-up and error message in `en`, `ta`, `hi` and `ml`, using the same `key`s as `shared/prototype/data.js` (`QUESTIONS`).
-- **Backend (Gautam → everyone):** the API contract below. Don't rename fields.
+The AI and voice features need `SARVAM_API_KEY` set in the Vercel project environment. Keys are never committed.
 
+## Repository
+
+| Path | What's inside |
+|---|---|
+| [`aira/app/`](aira/app) | **The live app**: UI, rules engine, data, voice, accounts, serverless API, tests |
+| [`aira/audit/`](aira/audit) | Product and logic audit, plus the engineering changelog |
+| [`aira/design/`](aira/design) · [`aira/screenshots/`](aira/screenshots) | Design system and interface explorations |
+| [`shared/prototype/`](shared/prototype) | Read-only baseline prototype |
+| [`gautam/backend/`](gautam/backend) | FastAPI backend implementing the team API contract |
+| [`nandana/`](nandana) | Conversation script, voice states, test personas and logs |
+| [`akshaj/`](akshaj) · [`pranshu/`](pranshu) | Voice engine research · roadmap, architecture and dataset |
+
+## Team Absolute Zero
+
+| | Role |
+|---|---|
+| **Aira** | Lead · product, UI/UX, app engineering |
+| **Nandana** | Conversation design, voice states, testing |
+| **Akshaj** | Voice engine |
+| **Gautam** | Backend (FastAPI) and API contract |
+| **Pranshu** | Roadmap, production architecture, data |
+
+<details>
+<summary><b>Contributor rules and the team API contract</b></summary>
+
+**Work only inside your own folder.** Nobody edits anyone else's folder or `shared/`. Never commit keys (they go in `.env`, which is git-ignored). Never make up scheme facts, statistics or quotes: every rule needs its official link.
+
+**Voice contract:** `window.RaastaVoice = { listen(lang) → Promise<{text}>, speak(text, lang) → Promise<void> }`.
+
+**Backend contract (Gautam):**
 ```
 POST /api/profile/chat      {student_id, lang, message}        -> {reply_text, profile, done}
 POST /api/careers/match     {profile}                          -> [{career_id, title, type, why, earning_range}]
@@ -50,29 +132,10 @@ GET  /api/offline-pack                                         -> {opportunities
 POST /api/stt               audio file + {lang}                -> {text}
 POST /api/tts               {text, lang}                       -> audio (wav/mp3)
 ```
+The live demo runs its own serverless endpoints (`/api/chat`, `/api/routes`, `/api/stt`, `/api/tts`, `/api/understand`, `/api/voice-status`). Aligning the two is tracked in [`aira/audit/`](aira/audit).
 
-## Rules
-1. **Only touch your own folder.** Need something from someone? Ask in the group.
-2. **Never commit API keys or passwords.** Keys go in a local `.env` file, which `.gitignore` already blocks.
-3. **Never make up scheme facts, statistics or quotes.** Every scholarship rule needs its official link.
-4. Commit small and often, with clear messages, e.g. `akshaj: add BHASHINI tts call`.
-5. **Feature freeze: Sat 21 Nov, 9 PM.** After that, bug fixes only.
-6. Post one line in the group every night: done / blocked / next.
+</details>
 
-## Timeline
-| Day | Goal |
-|---|---|
-| Fri 20 Nov | Everyone sets up their folder and starts |
-| Sat 21 Nov | Pieces done by 6 PM, compilation into `final/` from 6-9 PM, **freeze at 9 PM** |
-| Sun 22 Nov | 3 timed rehearsals, backup demo video |
-| Mon 23 Nov | **Demo, 11:00 AM-2:00 PM** (10 min plus 5 min Q&A) |
+---
 
-## Run the baseline prototype
-```
-python -m http.server 5173 --directory shared/prototype
-```
-Open http://localhost:5173 in Chrome, tap **தமிழ்**, then **▶ Demo: Kavya's answers**.
-
-## Not assigned yet
-- Verifying every scholarship rule in `shared/prototype/data.js` on its official page (currently **placeholders**). Aira to assign.
-- Deck (8 slides) and backup demo video. Aira to assign.
+<div align="center"><sub>Made in Chennai for students whose skills deserve a map.</sub></div>
