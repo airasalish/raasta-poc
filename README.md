@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="aira/app/raasta-icon-192.png" width="88" alt="Raasta icon">
-
 # Raasta · ராஸ்தா
 
 ### Google Maps for careers, for rural India.
