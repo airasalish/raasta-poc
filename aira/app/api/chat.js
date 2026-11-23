@@ -33,7 +33,7 @@ function clean(updates) {
 // Student declines or can't answer: move on, never nag.
 const REFUSE = /don'?t want|do not want|rather not|prefer not|\bskip\b|no idea|not sure|don'?t know|do not know|வேண்டாம்|தெரியாது|விருப்பமில்லை|नहीं पता|नहीं बताना|मत पूछ|छोड़|അറിയില്ല|വേണ്ട|പറയാൻ താല്പര്യമില്ല/i;
 
-const INCOME_WORDS = /lakh|lac|per year|a year|annual|yearly|income|family earn|parents earn|லட்ச|வருட|வருமான|लाख|सालाना|आय|आमदनी|ലക്ഷ|വർഷ|വരുമാന/i;
+const INCOME_WORDS = /lakh|\blac\b|per year|a year|annual|yearly|income|family earn|parents earn|லட்ச|வருட|வருமான|लाख|सालाना|आय|आमदनी|ലക്ഷ|വർഷ|വരുമാന/i;
 
 // Decide the next step in code, not in the model.
 //   discover: talk about skills (first turns) -> fact: ask one missing fact -> finish.
@@ -103,7 +103,7 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
 
   try {
     // 1) Understand this answer first, so the reply never asks for something just answered.
-    const extractText = await call([{ role: 'system', content: extractSystem }, { role: 'user', content: answer }], 220).catch(() => '');
+    const extractText = await call([{ role: 'system', content: extractSystem }, { role: 'user', content: answer }], 450).catch(() => '');
     let ex = {};
     try { const m = extractText.match(/\{[\s\S]*\}/); ex = m ? JSON.parse(m[0]) : {}; } catch (e) { ex = {}; }
     const norm = x => String(x || '').toLowerCase().replace(/[\s.,!?'"]+/g, '');
