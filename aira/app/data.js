@@ -64,6 +64,11 @@ const KAVYA = { name: "Kavya", district: "Villupuram", state: "TN", lang: "ta",
   interests: ["stitching"], age: 17, education: "c11_12", gender: "female", govt_school: true,
   category: "obc", family_income_lakh: 2, marks_percent: 82, disability: false };
 
+// Murugan: second presenter persona (mobile repair)
+const MURUGAN = { name: "Murugan", district: "Villupuram", state: "TN", lang: "ta",
+  interests: ["phone_repair"], age: 16, education: "c9_10", gender: "male", govt_school: true,
+  category: "sc", family_income_lakh: 0.8, marks_percent: 65, disability: false };
+
 const CAREERS = [
   { id: "fashion_tech", type: "professional", tags: ["stitching", "drawing"], min_edu: ["c11_12", "passed12"],
     title: { en: "Fashion Technology (Diploma / B.Des)", ta: "ஃபேஷன் டெக்னாலஜி" },

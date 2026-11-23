@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "generated_for": "RAASTA Field Atlas",
+  "scope": "aira/public/assets",
+  "notes": [
+    "SVGs are intentionally lightweight, text-free visual assets.",
+    "Career labels, eligibility, source facts, and translations remain in the application data.",
+    "Raahi mascot assets are not replaced or duplicated by this library."
+  ],
+  "career_illustrations": {
+    "fashion_tech": {
+      "card": "illustrations/careers/career-fashion-tech--card.svg",
+      "route": "illustrations/route/career-fashion-tech--route.svg",
+      "purpose": "Career Routes card and Kavya's primary pathway landmark"
+    },
+    "garment_supervisor": {
+      "card": "illustrations/careers/career-garment-supervisor--card.svg",
+      "route": "illustrations/route/career-garment-supervisor--route.svg",
+      "purpose": "Career Routes card and adjacent Kavya pathway landmark"
+    },
+    "iti_sewing": {
+      "card": "illustrations/careers/career-iti-sewing--card.svg",
+      "route": "illustrations/route/career-iti-sewing--route.svg",
+      "purpose": "Career Routes card and practical training pathway landmark"
+    },
+    "textile_design_digital": {
+      "card": "illustrations/careers/career-textile-design-digital--card.svg",
+      "route": "illustrations/route/career-textile-design-digital--route.svg",
+      "purpose": "Career Routes card and creative pathway landmark"
+    },
+    "mobile_tech": {
+      "card": "illustrations/careers/career-mobile-tech--card.svg",
+      "purpose": "Technology career card"
+    },
+    "agri_drone": {
+      "card": "illustrations/careers/career-agri-drone--card.svg",
+      "purpose": "Field and emerging-career card"
+    },
+    "food_processing": {
+      "card": "illustrations/careers/career-food-processing--card.svg",
+      "purpose": "Making and rural-occupation career card"
+    },
+    "teacher": {
+      "card": "illustrations/careers/career-teacher--card.svg",
+      "purpose": "People and education career card"
+    },
+    "electrician": {
+      "card": "illustrations/careers/career-electrician--card.svg",
+      "purpose": "Technology and skilled-trade career card"
+    },
+    "appliance_tech": {
+      "card": "illustrations/careers/career-appliance-tech--card.svg",
+      "purpose": "Technology and repair career card"
+    },
+    "performing_arts": {
+      "card": "illustrations/careers/career-performing-arts--card.svg",
+      "purpose": "Creative career card"
+    },
+    "sports_coach": {
+      "card": "illustrations/careers/career-sports-coach--card.svg",
+      "purpose": "People and physical-education career card"
+    }
+  },
+  "route_primitives": {
+    "route-start.svg": "Talk, Don't Type start point and pathway origin",
+    "route-destination.svg": "Completed route or shared destination",
+    "milestone-node.svg": "Week-by-week My Pathway milestone",
+    "source-marker.svg": "Opportunity Radar evidence/source cue",
+    "direction-arrow.svg": "Non-interactive direction cue at a route end"
+  },
+  "map_elements": {
+    "field-atlas-contours.svg": "Low-contrast desktop presenter topographic contour layer",
+    "field-atlas-route.svg": "Non-interactive dotted Field Atlas route layer",
+    "crop-row-horizon.svg": "Abstract rural landscape/crop-row atmosphere; not a literal location"
+  },
+  "integration_rules": {
+    "preferred_loading": "Use img width/height or CSS aspect-ratio; lazy-load below-the-fold career cards.",
+    "decorative_assets": "Mark map and landscape layers aria-hidden and keep pointer-events none.",
+    "fallback": "If a career asset is missing, preserve the current text/card layout and do not block rendering.",
+    "mobile_budget": "Keep one active career card illustration plus required route primitives in the first view; avoid preloading the full library."
+  }
+}

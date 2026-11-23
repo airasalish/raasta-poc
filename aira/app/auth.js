@@ -14,7 +14,7 @@
   const saveUsers = u => { try { localStorage.setItem(UKEY, JSON.stringify(u)); } catch (e) {} };
   let users = load();
   let session = null; try { session = JSON.parse(sessionStorage.getItem(SKEY) || localStorage.getItem(SKEY) || 'null'); } catch (e) {}
-  const me = () => (session && session.demo ? { name: 'Kavya', role: 'student', demo: true } : session && users[session.id]);
+  const me = () => (session && session.demo ? { name: session.name || 'Kavya', role: 'student', demo: true } : session && users[session.id]);
   let ui = { mode: 'list', role: 'student', pick: null, err: '' };
 
   async function hash(pin, salt) {
@@ -140,7 +140,8 @@
     if (act === 'auth-new') { ui = { mode: 'new', role: x.dataset.role, err: '' }; render(); setTimeout(() => document.getElementById('authName')?.focus(), 0); }
     if (act === 'auth-back') { ui = { mode: 'list', err: '' }; render(); }
     if (act === 'auth-out') signOut();
-    if (act === 'auth-demo') { session = { demo: true }; try { sessionStorage.setItem(SKEY, JSON.stringify(session)); sessionStorage.setItem('raasta_demo_mode', '1'); } catch (er) {} S.profile = { ...KAVYA }; S.msgs = [{ who: 'bot', text: t('routeReady') }]; S.step = QUESTIONS.length; S.view = 'careers'; render(); }
+    if (act === 'auth-reset') { Object.assign(S, { step: 0, msgs: [], skills: [], sugg: [], convo: [], asked: [], retried: [], lastAsking: null, aiDone: false, aiRoutes: [], careerId: null, profile: { state: 'TN', disability: false } }); if (me()) signOut(); else { S.view = 'login'; render(); } return; }
+    if (act === 'auth-demo') { const who = x.dataset.who === 'murugan' && typeof MURUGAN !== 'undefined' ? MURUGAN : KAVYA; if (session && !session.demo) snapshot(); session = { demo: true, name: who.name }; try { sessionStorage.setItem(SKEY, JSON.stringify(session)); sessionStorage.setItem('raasta_demo_mode', '1'); } catch (er) {} Object.assign(S, { skills: [], sugg: [], convo: [], asked: [], retried: [], lastAsking: null, aiRoutes: [], careerId: null, aiDone: true }); S.profile = { ...who }; S.msgs = [{ who: 'bot', text: t('routeReady') }]; S.step = QUESTIONS.length; S.view = 'careers'; render(); }
   });
   document.addEventListener('submit', async e => {
     if (e.target.id === 'authNew') {
