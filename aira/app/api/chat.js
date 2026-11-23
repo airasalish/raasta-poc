@@ -97,7 +97,7 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
     const factsStarted = asked.length > 0 || known.length > 0;
     let stage, next = null;
     if (!factsStarted && userTurns < 3) stage = 'discover';
-    else if (toAsk.length) { stage = 'fact'; next = toAsk[0]; }
+    else if (toAsk.length && userTurns < 12) { stage = 'fact'; next = toAsk[0]; }
     else stage = 'finish';
 
     const base = `You are Raahi, a warm career guide for rural Indian students. Reply ONLY in ${lang}, plain text, max 2 short sentences, simple words a 15-year-old understands (it is read aloud). Never promise jobs, money or scholarships. Never invent facts. Never say "you already told me".`;
