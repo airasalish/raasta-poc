@@ -43,6 +43,27 @@
     return statusPromise;
   }
 
+  // ---------- iPhone/Safari audio unlock ----------
+  // Safari only lets audio play if the element was first started during a tap. We unlock one shared
+  // <audio> element, one AudioContext and speechSynthesis on the first tap, then reuse them.
+  const player = new Audio();
+  player.setAttribute('playsinline', '');
+  let sharedCtx = null, unlocked = false;
+  function getCtx() {
+    try {
+      if (!sharedCtx) sharedCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (sharedCtx.state === 'suspended') sharedCtx.resume();
+    } catch (e) {}
+    return sharedCtx;
+  }
+  function unlock() {
+    if (unlocked) return; unlocked = true;
+    try { player.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA='; player.play().catch(() => {}); } catch (e) {}
+    getCtx();
+    try { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) {}
+  }
+  ['touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, unlock, { capture: true, passive: true }));
+
   // ---------- speak ----------
   const ttsCache = new Map(); // same sentence is never paid for twice in one session
   let current = null;
@@ -53,11 +74,13 @@
   }
 
   function playB64(b64) {
-    return new Promise(resolve => {
-      const a = new Audio('data:audio/wav;base64,' + b64);
+    return new Promise((resolve, reject) => {
+      const a = player;
       current = a;
-      a.onended = a.onerror = () => { if (current === a) current = null; resolve(); };
-      a.play().catch(() => resolve());
+      a.onended = () => { if (current === a) current = null; resolve(); };
+      a.onerror = () => { if (current === a) current = null; reject(new Error('play')); };
+      a.src = 'data:audio/wav;base64,' + b64;
+      a.play().catch(reject); // blocked or unsupported -> caller falls back to the browser voice
     });
   }
 
@@ -96,7 +119,7 @@
           ttsCache.set(key, b64);
           addUsage(Math.max(0.5, (b64.length * 0.75 - 44) / (22050 * 2))); // WAV, 22.05 kHz mono 16-bit
         }
-        return playB64(b64);
+        return await playB64(b64);
       } catch (e) { /* fall through to the browser voice */ }
     }
     return browserSpeak(text, locale);
@@ -113,7 +136,7 @@
       const finish = () => {
         if (done) return; done = true;
         cancelAnimationFrame(raf);
-        try { ctx && ctx.close(); } catch (e) {}
+
         if (rec.state !== 'inactive') rec.stop();
       };
       rec.ondataavailable = e => e.data && e.data.size && chunks.push(e.data);
@@ -125,7 +148,7 @@
       rec.start();
       // Stop after ~1.2 s of quiet once the student has spoken, or at maxMs.
       try {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        ctx = getCtx();
         const an = ctx.createAnalyser(); an.fftSize = 1024;
         ctx.createMediaStreamSource(stream).connect(an);
         const buf = new Uint8Array(an.fftSize);
@@ -180,6 +203,7 @@
 
   async function listen(locale) {
     locale = locale || 'en-IN';
+    unlock(); getCtx(); // still inside the tap: wake audio before any await (needed on iPhone)
     stopAll();
     const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
     if (canRecord && await sarvamReady()) {
