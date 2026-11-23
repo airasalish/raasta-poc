@@ -136,3 +136,6 @@ document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;c
 window.addEventListener('resize',()=>{updateBreakoutCards();updateNavIndicator(S.view)});
 const ROUTE_ART=new Set(['agri_drone','appliance_tech','electrician','fashion_tech','food_processing','garment_supervisor','iti_sewing','mobile_tech','performing_arts','sports_coach','teacher','textile_design_digital']);
 function routeArt(c){return c&&ROUTE_ART.has(c.id)?`<img class="route-art" src="assets/careers/career-${c.id.replace(/_/g,'-')}--card.svg" alt="" loading="lazy" width="72" height="72">`:''}
+const DEMO_TOAST={en:{sw:(n,r)=>`Switched to ${n}`+(r?` · ${r}`:''),reset:'Demo reset',Kavya:'Kavya',Murugan:'Murugan'},ta:{sw:(n,r)=>`${n} டெமோ`+(r?` · ${r}`:''),reset:'டெமோ மீட்டமைக்கப்பட்டது',Kavya:'காவ்யா',Murugan:'முருகன்'},hi:{sw:(n,r)=>`${n} का डेमो`+(r?` · ${r}`:''),reset:'डेमो रीसेट हुआ',Kavya:'काव्या',Murugan:'मुरुगन'},ml:{sw:(n,r)=>`${n} ഡെമോ`+(r?` · ${r}`:''),reset:'ഡെമോ പുനഃസജ്ജമാക്കി',Kavya:'കാവ്യ',Murugan:'മുരുഗൻ'}};
+function demoToast(name){const d=DEMO_TOAST[S.lang]||DEMO_TOAST.en;if(!name){showToast(d.reset,'info');return}const c=paths()[0];showToast(d.sw(d[name]||name,c?L(c.title):''),'success')}
+window.demoToast=demoToast;
