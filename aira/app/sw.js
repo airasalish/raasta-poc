@@ -1,6 +1,6 @@
 // Offline-first: cache the app shell + rules/data so the whole Kavya journey works in airplane mode.
-const CACHE = "raasta-v35";
-const FILES = ["./", "index.html", "presenter.html", "presenter.css", "presenter.js", "app.js", "engine.js", "data.js", "voice.js", "voice-orb.js", "auth.js", "manifest.json","intro.css","intro.js","assets/illustrations/raahi-default.jpg","assets/audio/kavya-parent-ta.mp3","raasta-icon-192.png","raasta-icon-512.png","raasta-icon-maskable.png"];
+const CACHE = "raasta-v36";
+const FILES = ["./", "index.html", "presenter.html", "presenter.css", "presenter.js", "app.js", "engine.js", "parentMode.js", "data.js", "voice.js", "voice-orb.js", "auth.js", "manifest.json","intro.css","intro.js","assets/illustrations/raahi-default.jpg","assets/audio/kavya-parent-ta.mp3","raasta-icon-192.png","raasta-icon-512.png","raasta-icon-maskable.png"];
 self.addEventListener("install", e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))));
 self.addEventListener("fetch", e => {
