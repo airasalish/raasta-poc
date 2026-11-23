@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
   const system =
 `Suggest 3 realistic career routes in India for a rural student (${who}) whose skills and interests are: ${skills.join(', ')}.
 Routes must come DIRECTLY from these skills (e.g. singing -> playback/devotional singer, music teacher, sound/recording assistant). Mix one vocational or low-cost route, one study route, and one emerging route. No salary numbers, no promises.
-Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","type":"vocational|professional|emerging|govt","why":"<one sentence in ${lang} linking to their skill>","steps":[{"step":"<short step in ${lang}>","course":"<a SPECIFIC real course, certificate or programme name in English, e.g. Certificate in Carnatic Music, Sound Recording Assistant (QP), or empty>","site":"swayam|nptel|skillindia|apprenticeship|ncs|diksha|ignou|nios|tnskill|none"}, 4 steps total],"exams":["<real course/exam/certificate names, English>"]}]}`;
+Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","job":"<the everyday English name of the job people do, 1-3 words, e.g. groundskeeper, playback singer, tailor>","type":"vocational|professional|emerging|govt","why":"<one sentence in ${lang} linking to their skill>","steps":[{"step":"<short step in ${lang}>","course":"<a SPECIFIC real course, certificate or programme name in English, e.g. Certificate in Carnatic Music, Sound Recording Assistant (QP), or empty>","site":"swayam|nptel|skillindia|apprenticeship|ncs|diksha|ignou|nios|tnskill|none"}, 4 steps total],"exams":["<real course/exam/certificate names, English>"]}]}`;
 
   try {
     const r = await fetch('https://api.sarvam.ai/v1/chat/completions', {
@@ -58,6 +58,7 @@ Return ONLY JSON: {"routes":[{"title":"<route name in ${lang}>","type":"vocation
     const routes = (Array.isArray(out.routes) ? out.routes : []).slice(0, 4).map((x, i) => ({
       id: 'ai:' + i,
       title: String(x.title || '').slice(0, 80),
+      job: String(x.job || '').replace(/[^A-Za-z \-]/g, '').slice(0, 40).trim(),
       type: TYPES.includes(x.type) ? x.type : 'emerging',
       why: String(x.why || '').slice(0, 240),
       earn: '',
