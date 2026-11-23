@@ -14,7 +14,7 @@
   const saveUsers = u => { try { localStorage.setItem(UKEY, JSON.stringify(u)); } catch (e) {} };
   let users = load();
   let session = null; try { session = JSON.parse(sessionStorage.getItem(SKEY) || localStorage.getItem(SKEY) || 'null'); } catch (e) {}
-  const me = () => (session && session.demo ? { name: 'Kavya', role: 'student', demo: true } : session && users[session.id]);
+  const me = () => (session && session.demo ? { name: session.teacherDemo ? 'Facilitator' : 'Kavya', role: session.teacherDemo ? 'teacher' : 'student', demo: true } : session && users[session.id]);
   let ui = { mode: 'list', role: 'student', pick: null, err: '' };
 
   async function hash(pin, salt) {
@@ -107,11 +107,11 @@
     const nReal = all.filter(s => s.real).length, nDemo = all.length - nReal;
     const row = s => `<article class="student-row"><div><strong>${esc(s.name)}</strong> <span class="status-label" style="font-size:11px;opacity:.8">${s.real ? f('real') : f('sample')}</span>`
       + (s.started
-        ? `<p>${f('top')}: ${esc(s.top || '—')}</p>${s.skills.length ? `<p>${f('skills')}: ${esc(s.skills.join(', '))}</p>` : ''}<p>${s.n ? f('toCheck')(s.n) : ''}${s.why.length ? (s.n ? ' · ' : '') + '⚑ ' + esc(s.why.join(', ')) : ''}</p>`
+        ? `<p>${f('top')}: ${esc(s.top || '—')}</p>${s.skills.length ? `<p>${f('skills')}: ${esc(s.skills.join(', '))}</p>` : ''}${s.n ? `<p>${f('toCheck')(s.n)}</p>` : ''}${s.why.length ? `<p class="attention-reasons">${esc(s.why.join(', '))}</p>` : ''}`
         : `<p>${f('notStarted')}</p>`)
       + `</div>${S.recommended[s.student_id] ? `<span class="status-label">${t('referredDone')}</span>` : (s.started ? `<button class="secondary-action" data-act="rec" data-v="${esc(s.student_id)}">${t('refer')}</button>` : '')}</article>`;
     return `<div class="facilitator-view"><div class="page-heading"><div class="eyebrow">${t('teacher')}</div><h1>${f('title')}</h1><p>${f('sub')(nReal, nDemo)}</p></div>`
-      + `<div class="metrics"><div><strong>${all.length}</strong><span>${f('students')}</span></div><div><strong>${all.filter(s => s.flag).length}</strong><span>${f('attention')}</span></div><div><strong>${all.reduce((x, s) => x + s.n, 0)}</strong><span>${f('schemes')}</span></div><div><strong>${Object.keys(S.recommended).length}</strong><span>${f('referred')}</span></div></div>`
+      + `<div class="metrics"><div><strong>${all.length}</strong><span>${f('students')}</span></div><div><strong>${all.filter(s => s.flag).length}</strong><span>${f('attention')}</span></div><div><strong>${Object.keys(S.recommended).length}</strong><span>${f('referred')}</span></div></div><p class="scheme-note">${all.reduce((x, s) => x + s.n, 0)} ${f('schemes').toLowerCase()}</p>`
       + `<button class="filter-action" data-act="filter-fac" data-v="${S.facilitatorFilter === 'flagged' ? 'all' : 'flagged'}">${S.facilitatorFilter === 'flagged' ? f('all') : f('flagged')}</button> <button class="filter-action" data-act="auth-sample">${hideSample() ? f('show') : f('hide')}</button>`
       + rows.map(row).join('') + `</div>`;
   }
@@ -121,7 +121,7 @@
   render = function () {
     const u = me();
     if (!u && S.view !== 'language' && S.view !== 'login') S.view = 'login';
-    if (u && u.role !== 'teacher' && S.view === 'facilitator') S.view = 'careers';
+    if (u && u.role !== 'teacher' && !u.demo && S.view === 'facilitator') S.view = 'careers';
     if (u && u.role === 'teacher' && !['facilitator', 'language'].includes(S.view)) S.view = 'facilitator';
     baseRender();
     const pb = document.getElementById('profileHeaderBtn'); if (pb && u && u.role !== 'teacher') pb.style.display = '';

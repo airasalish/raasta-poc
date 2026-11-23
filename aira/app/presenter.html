@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8"><meta name="google" content="notranslate">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#102d22">
+  <meta name="theme-color" content="#0B382B">
   <meta name="description" content="Raasta — the Field Atlas live product presentation.">
   <title>Raasta · Live Field Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Mukta+Malar:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="presenter.css">
+  <link rel="stylesheet" href="presenter.css"><link rel="stylesheet" href="presenter-field-atlas.css">
 </head>
 <body>
   <div class="atlas-bg" aria-hidden="true"><span class="contour contour-a"></span><span class="contour contour-b"></span><span class="route-line"></span><span class="route-node node-a"></span><span class="route-node node-b"></span></div>
@@ -18,13 +18,13 @@
     <div class="topbar-meta"><span class="live-status"><i></i>LIVE PRODUCT VIEW</span><span class="topbar-divider"></span><span>TEAM ABSOLUTE ZERO</span></div>
   </header>
   <main class="presentation-grid">
-    <aside class="story-panel" aria-label="Raasta presentation introduction">
-      <div class="eyebrow">A career map for every student</div>
-      <h1>Make the<br><em>next step</em><br>feel possible.</h1>
-      <p class="story-copy">Talk. Explore careers. Find opportunities. Build a path — in your language.</p>
-      <div class="story-route" aria-hidden="true"><span class="story-route-start"></span><span class="story-route-path"></span><span class="story-route-end"><svg viewBox="0 0 24 24"><path d="M5 19 19 5M9 5h10v10"/></svg></span></div>
-      <div class="story-note"><span class="note-mark">01</span><p><strong>Built around Kavya.</strong><br>17 · Class 12 · Villupuram · Tamil speaker</p></div>
-      <p class="story-foot">A live, interactive product view — not a screenshot.</p>
+    <aside class="story-panel" id="storyPanel" aria-label="Raasta presentation introduction">
+      <div class="eyebrow" id="storyEyebrow">Start in her own words</div>
+      <h1 id="storyTitle">Talk.<br><em>Discover.</em><br>Plan.</h1>
+      <p class="story-copy" id="storyCopy">A voice-first conversation that learns from what she says — not a form.</p>
+      <div class="story-route" id="storyRoute" aria-label="Talk, discover, explore, plan"><span class="route-point">Talk</span><span class="route-link" aria-hidden="true"></span><span class="route-point">Discover</span><span class="route-link" aria-hidden="true"></span><span class="route-point">Explore</span><span class="route-link" aria-hidden="true"></span><span class="route-point">Plan</span></div>
+      <div class="story-note"><span class="note-mark">FIELD NOTE</span><p><strong>Built around Kavya.</strong><br>17 · Class 12 · Villupuram · Tamil speaker</p></div>
+      <p class="story-foot">The live product, inside its phone — not a screenshot.</p>
     </aside>
     <section class="device-stage" aria-label="Live Raasta application preview">
       <div class="device-toolbar" role="toolbar" aria-label="Preview device controls">
@@ -42,14 +42,15 @@
       <div class="stage-caption"><span><b id="frameModeLabel">Mobile view</b> · actual Raasta app</span><span class="caption-hint">Scroll inside the device</span></div>
     </section>
     <aside class="control-panel" aria-label="Presenter controls">
-      <div class="panel-heading"><div><div class="eyebrow">Live walkthrough</div><h2>Kavya’s route</h2></div><span class="panel-index" id="stageIndex">01 / 05</span></div>
+      <div class="panel-heading"><div><div class="eyebrow">Six live interfaces</div><h2>Kavya’s field atlas</h2></div><span class="panel-index" id="stageIndex">01 / 06</span></div>
       <div class="persona-card"><div class="persona-avatar">க</div><div><strong>Kavya, 17</strong><span>Class 12 · Villupuram</span><span>Govt school · BC/OBC</span></div><span class="persona-pin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2"/></svg></span></div>
       <div class="stage-list" role="list">
-        <button type="button" class="stage-button is-active" data-stage="talk" role="listitem"><span class="stage-number">01</span><span class="stage-copy"><strong>Talk, Don’t Type</strong><small>Start in her own words</small></span><span class="stage-arrow">↗</span></button>
-        <button type="button" class="stage-button" data-stage="careers" role="listitem"><span class="stage-number">02</span><span class="stage-copy"><strong>Career Routes</strong><small>See what fits her skills</small></span><span class="stage-arrow">↗</span></button>
-        <button type="button" class="stage-button" data-stage="radar" role="listitem"><span class="stage-number">03</span><span class="stage-copy"><strong>Opportunity Radar</strong><small>Check rules and sources</small></span><span class="stage-arrow">↗</span></button>
-        <button type="button" class="stage-button" data-stage="pathway" role="listitem"><span class="stage-number">04</span><span class="stage-copy"><strong>My Pathway</strong><small>Turn direction into weeks</small></span><span class="stage-arrow">↗</span></button>
-        <button type="button" class="stage-button" data-stage="parent" role="listitem"><span class="stage-number">05</span><span class="stage-copy"><strong>Parent Mode</strong><small>Make the next step shared</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button is-active" data-stage="talk" role="listitem"><span class="stage-number">01</span><span class="stage-copy"><strong>Talk, Don’t Type</strong><small>Speak, tap or type in her language</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="facilitator" role="listitem"><span class="stage-number">02</span><span class="stage-copy"><strong>Facilitator Mode</strong><small>Review a school cohort</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="pathway" role="listitem"><span class="stage-number">03</span><span class="stage-copy"><strong>My Pathway</strong><small>Turn a route into next steps</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="parent" role="listitem"><span class="stage-number">04</span><span class="stage-copy"><strong>Parent Mode</strong><small>Listen together, in her language</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="radar" role="listitem"><span class="stage-number">05</span><span class="stage-copy"><strong>Opportunity Radar</strong><small>Read rules and official sources</small></span><span class="stage-arrow">↗</span></button>
+        <button type="button" class="stage-button" data-stage="careers" role="listitem"><span class="stage-number">06</span><span class="stage-copy"><strong>Career Routes</strong><small>See possible destinations</small></span><span class="stage-arrow">↗</span></button>
       </div>
       <button type="button" class="run-demo" id="runDemoBtn"><span class="run-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg></span><span><strong>Run Kavya’s demo</strong><small>Open the live starting point</small></span><span class="run-arrow">→</span></button>
       <div class="control-note"><span class="note-line"></span><p>Use the live app inside the device. Controls only move the preview; they do not replace the product.</p></div>
