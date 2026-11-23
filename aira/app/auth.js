@@ -75,7 +75,47 @@
   // Wrap views and render without touching their logic.
   views.login = loginView;
   const baseFac = views.facilitator, baseProfile = views.profile;
-  views.facilitator = () => accountBar() + deviceStudents() + baseFac();
+  // Teacher's class: real students who signed up on this phone first, then the sample class (clearly marked).
+  const FT = {
+    en: { title: 'My class', sub: (r, d) => `${r} signed up on this phone · ${d} sample students`, students: 'Students', attention: 'Need a closer look', schemes: 'Scheme matches', referred: 'Referred', sample: 'Sample', real: 'On this phone', notStarted: 'Has not talked to Raasta yet', marks: 'Strong marks', many: 'Many interests', poor: 'Low family income', toCheck: n => `${n} schemes to check`, hide: 'Hide sample students', show: 'Show sample students', all: 'Show everyone', flagged: 'Only those who need a look', skills: 'Skills', top: 'Top route' },
+    ta: { title: 'என் வகுப்பு', sub: (r, d) => `இந்தக் கைபேசியில் ${r} பேர் · ${d} மாதிரி மாணவர்கள்`, students: 'மாணவர்கள்', attention: 'கூடுதல் கவனம்', schemes: 'திட்டப் பொருத்தங்கள்', referred: 'பரிந்துரைத்தவை', sample: 'மாதிரி', real: 'இந்தக் கைபேசி', notStarted: 'இன்னும் ராஸ்தாவுடன் பேசவில்லை', marks: 'நல்ல மதிப்பெண்', many: 'பல ஆர்வங்கள்', poor: 'குறைந்த குடும்ப வருமானம்', toCheck: n => `சரிபார்க்க ${n} திட்டங்கள்`, hide: 'மாதிரி மாணவர்களை மறை', show: 'மாதிரி மாணவர்களைக் காட்டு', all: 'அனைவரையும் காட்டு', flagged: 'கவனம் தேவைப்படுவோர் மட்டும்', skills: 'திறன்கள்', top: 'முதல் வழி' },
+    hi: { title: 'मेरी कक्षा', sub: (r, d) => `इस फ़ोन पर ${r} विद्यार्थी · ${d} नमूना विद्यार्थी`, students: 'विद्यार्थी', attention: 'ध्यान देने लायक', schemes: 'योजना मिलान', referred: 'रेफ़र किए', sample: 'नमूना', real: 'इस फ़ोन पर', notStarted: 'अभी रास्ता से बात नहीं की', marks: 'अच्छे अंक', many: 'कई रुचियाँ', poor: 'कम पारिवारिक आय', toCheck: n => `${n} योजनाएँ जाँचें`, hide: 'नमूना विद्यार्थी छिपाएँ', show: 'नमूना विद्यार्थी दिखाएँ', all: 'सभी दिखाएँ', flagged: 'केवल ध्यान देने लायक', skills: 'स्किल्स', top: 'मुख्य रास्ता' },
+    ml: { title: 'എന്റെ ക്ലാസ്', sub: (r, d) => `ഈ ഫോണിൽ ${r} പേർ · ${d} മാതൃകാ വിദ്യാർത്ഥികൾ`, students: 'വിദ്യാർത്ഥികൾ', attention: 'ശ്രദ്ധ വേണ്ടവർ', schemes: 'പദ്ധതി പൊരുത്തങ്ങൾ', referred: 'റഫർ ചെയ്തവർ', sample: 'മാതൃക', real: 'ഈ ഫോണിൽ', notStarted: 'ഇതുവരെ റാസ്തയോട് സംസാരിച്ചിട്ടില്ല', marks: 'നല്ല മാർക്ക്', many: 'പല താൽപര്യങ്ങൾ', poor: 'കുറഞ്ഞ കുടുംബ വരുമാനം', toCheck: n => `പരിശോധിക്കാൻ ${n} പദ്ധതികൾ`, hide: 'മാതൃകാ വിദ്യാർത്ഥികളെ മറയ്ക്കൂ', show: 'മാതൃകാ വിദ്യാർത്ഥികളെ കാണിക്കൂ', all: 'എല്ലാവരെയും കാണിക്കൂ', flagged: 'ശ്രദ്ധ വേണ്ടവർ മാത്രം', skills: 'കഴിവുകൾ', top: 'പ്രധാന വഴി' }
+  };
+  const f = k => (FT[S.lang] || FT.en)[k] || FT.en[k];
+  const hideSample = () => { try { return localStorage.getItem('raasta_hide_sample') === '1'; } catch (e) { return false; } };
+  function roster() {
+    const real = Object.entries(users).filter(([, u]) => u.role === 'student').sort((x, y) => (y[1].seen || 0) - (x[1].seen || 0)).map(([id, u]) => {
+      const d = u.data || {};
+      return { student_id: 'u:' + id, name: u.name, profile: d.profile || {}, skills: d.skills || [], aiRoutes: d.aiRoutes || [], real: true };
+    });
+    const demo = hideSample() ? [] : STUDENTS.map(s => ({ student_id: s.student_id, name: s.name, profile: s, skills: [], aiRoutes: [], real: false }));
+    return real.concat(demo).map(s => {
+      const p = s.profile, started = Object.keys(p).some(k => !['state', 'disability'].includes(k)) || s.skills.length > 0;
+      const why = [];
+      if (p.marks_percent >= 80) why.push(f('marks'));
+      if ((p.interests || []).length + s.skills.length >= 2) why.push(f('many'));
+      if (p.family_income_lakh != null && p.family_income_lakh <= 1) why.push(f('poor'));
+      let top = s.aiRoutes[0] ? s.aiRoutes[0].title : '';
+      if (!top && started) { try { const m = matchCareers(p)[0]; top = m ? L(m.title) : ''; } catch (e) {} }
+      let n = 0; if (started) { try { n = eligibility(p).filter(e => e.status !== 'not_eligible').length; } catch (e) {} }
+      return { ...s, started, why, top, n, flag: started && (talentFlag(p) || why.length > 0) };
+    });
+  }
+  function classView() {
+    const all = roster(), rows = all.filter(s => S.facilitatorFilter !== 'flagged' || s.flag);
+    const nReal = all.filter(s => s.real).length, nDemo = all.length - nReal;
+    const row = s => `<article class="student-row"><div><strong>${esc(s.name)}</strong> <span class="status-label" style="font-size:11px;opacity:.8">${s.real ? f('real') : f('sample')}</span>`
+      + (s.started
+        ? `<p>${f('top')}: ${esc(s.top || '—')}</p>${s.skills.length ? `<p>${f('skills')}: ${esc(s.skills.join(', '))}</p>` : ''}<p>${s.n ? f('toCheck')(s.n) : ''}${s.why.length ? (s.n ? ' · ' : '') + '⚑ ' + esc(s.why.join(', ')) : ''}</p>`
+        : `<p>${f('notStarted')}</p>`)
+      + `</div>${S.recommended[s.student_id] ? `<span class="status-label">${t('referredDone')}</span>` : (s.started ? `<button class="secondary-action" data-act="rec" data-v="${esc(s.student_id)}">${t('refer')}</button>` : '')}</article>`;
+    return `<div class="facilitator-view"><div class="page-heading"><div class="eyebrow">${t('teacher')}</div><h1>${f('title')}</h1><p>${f('sub')(nReal, nDemo)}</p></div>`
+      + `<div class="metrics"><div><strong>${all.length}</strong><span>${f('students')}</span></div><div><strong>${all.filter(s => s.flag).length}</strong><span>${f('attention')}</span></div><div><strong>${all.reduce((x, s) => x + s.n, 0)}</strong><span>${f('schemes')}</span></div><div><strong>${Object.keys(S.recommended).length}</strong><span>${f('referred')}</span></div></div>`
+      + `<button class="filter-action" data-act="filter-fac" data-v="${S.facilitatorFilter === 'flagged' ? 'all' : 'flagged'}">${S.facilitatorFilter === 'flagged' ? f('all') : f('flagged')}</button> <button class="filter-action" data-act="auth-sample">${hideSample() ? f('show') : f('hide')}</button>`
+      + rows.map(row).join('') + `</div>`;
+  }
+  views.facilitator = () => accountBar() + classView();
   views.profile = () => accountBar() + baseProfile();
   const baseRender = render;
   render = function () {
@@ -94,6 +134,7 @@
   document.addEventListener('click', e => {
     const x = e.target.closest('[data-act^="auth-"],[data-act="kavya"]'); if (!x) return;
     const act = x.dataset.act;
+    if (act === 'auth-sample') { try { localStorage.setItem('raasta_hide_sample', hideSample() ? '0' : '1'); } catch (er) {} render(); return; }
     if (act === 'kavya' && !me()) { session = { demo: true }; try { sessionStorage.setItem(SKEY, JSON.stringify(session)); } catch (er) {} return; }
     if (act === 'auth-pick') { ui = { mode: 'pin', pick: x.dataset.id, err: '' }; render(); setTimeout(() => document.getElementById('authPinIn')?.focus(), 0); }
     if (act === 'auth-new') { ui = { mode: 'new', role: x.dataset.role, err: '' }; render(); setTimeout(() => document.getElementById('authName')?.focus(), 0); }
