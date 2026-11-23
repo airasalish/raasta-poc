@@ -67,7 +67,7 @@ const KAVYA = { name: "Kavya", district: "Villupuram", state: "TN", lang: "ta",
 const CAREERS = [
   { id: "fashion_tech", type: "professional", tags: ["stitching", "drawing"], min_edu: ["c11_12", "passed12"],
     title: { en: "Fashion Technology (Diploma / B.Des)", ta: "ஃபேஷன் டெக்னாலஜி" },
-    why: "You already stitch for neighbours: that is real garment-construction skill.", earn: "₹15,000-30,000/month (indicative)",
+    why: "Stitching is real garment-construction skill, and this route builds on it.", earn: "₹15,000-30,000/month (indicative)",
     path: [["Learn pattern-making basics", "SWAYAM: search 'apparel'", "https://swayam.gov.in"],
            ["Practise 3 garments, photograph them as a portfolio", "Your own work", ""],
            ["Prepare for NIFT / state polytechnic entrance", "NIFT admissions", "https://www.nift.ac.in"],
@@ -88,7 +88,7 @@ const CAREERS = [
     exams: ["ITI admission (merit based)"] },
   { id: "textile_design_digital", type: "emerging", tags: ["stitching", "drawing", "computers"], min_edu: ["c11_12", "passed12", "ug"],
     title: { en: "Digital Textile & Print Designer", ta: "டிஜிட்டல் துணி வடிவமைப்பாளர்" },
-    why: "Emerging: online sellers need print designs; your stitching eye + free design tools.", earn: "₹500-2,000 per design online (indicative)",
+    why: "Emerging: online sellers need print designs; a feel for cloth plus free design tools is a start.", earn: "₹500-2,000 per design online (indicative)",
     path: [["Free course: design basics", "SWAYAM", "https://swayam.gov.in"],
            ["Make 10 sample prints", "Your own work", ""]], exams: ["None"] },
   { id: "mobile_tech", type: "vocational", tags: ["phone_repair", "computers"], min_edu: ["c9_10", "c11_12", "passed12", "dropout"],
@@ -178,7 +178,7 @@ const LANG_ADDITIONS={
   [['50% से कम','50–75%','75–90%','90% से अधिक'],['50%-ൽ താഴെ','50–75%','75–90%','90%-ൽ കൂടുതൽ']]
  ],
  careers:{
- fashion_tech:{title:{hi:'फैशन टेक्नोलॉजी (डिप्लोमा / बी.डिज़ाइन)',ml:'ഫാഷൻ ടെക്നോളജി (ഡിപ്ലോമ / ബി.ഡിസൈൻ)'},why:{hi:'आप पड़ोसियों के लिए सिलाई करती हैं—यह कपड़े बनाने का वास्तविक कौशल है।',ml:'അയൽവാസികൾക്കായി തുന്നുന്ന പരിചയം വസ്ത്രനിർമാണത്തിലെ യഥാർത്ഥ കഴിവാണ്.'}},
+ fashion_tech:{title:{hi:'फैशन टेक्नोलॉजी (डिप्लोमा / बी.डिज़ाइन)',ml:'ഫാഷൻ ടെക്നോളജി (ഡിപ്ലോമ / ബി.ഡിസൈൻ)'},why:{hi:'सिलाई कपड़े बनाने का असली कौशल है, और यह रास्ता उसी पर आगे बढ़ता है।',ml:'തയ്യൽ വസ്ത്രനിർമാണത്തിലെ യഥാർത്ഥ കഴിവാണ്, ഈ വഴി അതിൽ നിന്ന് വളരുന്നു.'}},
  garment_supervisor:{title:{hi:'गारमेंट यूनिट सुपरवाइज़र',ml:'ഗാർമെന്റ് യൂണിറ്റ് സൂപ്പർവൈസർ'},why:{hi:'सिलाई के साथ नेतृत्व सीखकर गारमेंट यूनिट में पर्यवेक्षक की राह देखी जा सकती है।',ml:'തയ്യലിനൊപ്പം നേതൃത്വം പഠിച്ച് ഗാർമെന്റ് യൂണിറ്റിൽ സൂപ്പർവൈസർ ജോലി പരിഗണിക്കാം.'}},
  iti_sewing:{title:{hi:'ITI सिलाई टेक्नोलॉजी',ml:'ഐടിഐ തയ്യൽ ടെക്നോളജി'},why:{hi:'सरकारी ITI में सिलाई का प्रशिक्षण एक व्यावहारिक विकल्प हो सकता है।',ml:'സർക്കാർ ഐടിഐയിലെ തയ്യൽ പരിശീലനം പ്രായോഗികമായൊരു വഴിയാകാം.'}},
  textile_design_digital:{title:{hi:'डिजिटल टेक्सटाइल और प्रिंट डिज़ाइनर',ml:'ഡിജിറ്റൽ ടെക്സ്റ്റൈൽ, പ്രിന്റ് ഡിസൈനർ'},why:{hi:'सिलाई और डिज़ाइन में रुचि को डिजिटल टेक्सटाइल डिज़ाइन में आगे बढ़ाया जा सकता है।',ml:'തയ്യലിലും രൂപകൽപ്പനയിലുമുള്ള താൽപര്യം ഡിജിറ്റൽ ടെക്സ്റ്റൈൽ ഡിസൈനിലേക്ക് വളർത്താം.'}},
