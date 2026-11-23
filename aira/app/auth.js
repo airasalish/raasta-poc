@@ -21,7 +21,7 @@
     const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + pin));
     return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
   }
-  const FIELDS = ['profile', 'skills', 'convo', 'msgs', 'step', 'aiDone', 'chatMode', 'aiRoutes', 'aiRoutesSig', 'careerId', 'sugg'];
+  const FIELDS = ['profile', 'skills', 'convo', 'msgs', 'step', 'aiDone', 'chatMode', 'aiRoutes', 'aiRoutesSig', 'careerId', 'sugg', 'asked'];
   function snapshot() {
     const u = me(); if (!u || u.demo || !session) return;
     const d = {}; FIELDS.forEach(k => { d[k] = S[k]; }); d.msgs = (S.msgs || []).filter(m => !m.thinking);
@@ -30,7 +30,7 @@
   function restore(u) {
     const d = (u && u.data) || {};
     S.profile = d.profile || { state: 'TN', disability: false }; S.skills = d.skills || []; S.convo = d.convo || []; S.msgs = d.msgs || [];
-    S.step = d.step || 0; S.aiDone = !!d.aiDone; S.chatMode = d.chatMode; S.aiRoutes = d.aiRoutes; S.aiRoutesSig = d.aiRoutesSig; S.careerId = d.careerId; S.sugg = d.sugg || [];
+    S.step = d.step || 0; S.aiDone = !!d.aiDone; S.chatMode = d.chatMode; S.aiRoutes = d.aiRoutes; S.aiRoutesSig = d.aiRoutesSig; S.careerId = d.careerId; S.sugg = d.sugg || []; S.asked = d.asked || [];
   }
   function startSession(id, remember) {
     session = { id }; try { sessionStorage.setItem(SKEY, JSON.stringify(session)); localStorage.setItem(SKEY, JSON.stringify(session)); } catch (e) {}

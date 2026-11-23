@@ -50,21 +50,22 @@ module.exports = async (req, res) => {
   const MODEL = process.env.SARVAM_CHAT_MODEL || 'sarvam-105b-conversations';
   const lastQ = [...history].reverse().find(m => m.role === 'assistant');
   const answer = history[history.length - 1].content;
-
-  const replySystem =
-`You are Raahi, a warm, curious career guide for rural Indian students (Class 9 to college). Reply ONLY in ${lang}, plain text, max 2 short sentences, simple words a 15-year-old understands (it is read aloud).
-Your goal is to DISCOVER who the student is, not to make them fit a list.
-- Acknowledge exactly what they said, then ask ONE follow-up question about it (how they learned it, what they enjoy most, who they do it for, have they taught it or earned from it). Hidden skills often come from home, family work, festivals, shops and helping others.
-- If they say "I don't know" or answer very briefly, make it easy: ask about a normal day, what family or friends ask their help with, or what makes time fly. Never make them feel wrong.
-- Once you understand their skills and interests (after about 3-4 of their answers), gently ask these facts for scholarships, one per turn, saying briefly why: ${missing.join(', ') || 'none left'}. Already known: ${known.join(', ') || 'nothing'}. If they don't want to say, move on.
-- If nothing is missing, thank them warmly and tell them their routes are ready.
-- Never promise jobs, money or scholarships. Never invent facts.
-Skills noticed so far: ${skills.join(', ') || 'none'}.`;
+  // Fields already asked once: if the student skipped them, we move on instead of asking again.
+  const asked = (Array.isArray(b.asked) ? b.asked : []).filter(k => k in FIELDS);
+  const ASK = {
+    age: 'how old they are',
+    education: 'which class they are in now, or the last class they finished',
+    gender: 'whether they are a girl or a boy (some scholarships are only for girls)',
+    govt_school: 'whether they study in a government school',
+    category: 'their community category: General, OBC/BC, SC, ST or minority (only for scholarships; they may skip)',
+    family_income_lakh: 'roughly how much their family earns in a year, in lakhs',
+    marks_percent: 'their marks percentage in the last exam'
+  };
 
   const extractSystem =
 `Extract facts from a student's answer. The question was: "${lastQ ? lastQ.content : ''}". The answer may be in any Indian language or a speech transcript.
 Return ONLY a JSON object: {"updates":{"<field>":{"value":<value>,"quote":"<exact words from the answer that state it>"}},"skills":[...]}
-updates: include a field ONLY if the answer explicitly states it; never guess (do not infer age from class, gender from context, or income/marks unless numbers or ranges are said). Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if clearly related (e.g. sewing = stitching).
+updates: include a field ONLY if the answer explicitly states it, or it is a direct short answer to the question (e.g. question about income, answer "4" -> family_income_lakh 4); never guess. Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if clearly related (e.g. sewing = stitching).
 skills: abilities, interests or experiences shown in the answer, as short English labels (e.g. "Dance", "Teaching children", "Shop accounts"). [] if none.`;
 
   const call = (messages, max) => fetch('https://api.sarvam.ai/v1/chat/completions', {
@@ -74,12 +75,8 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
   }).then(async r => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error('sarvam ' + r.status + ' ' + (j.error && j.error.message || '')); return String(j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim(); });
 
   try {
-    const [replyText, extractText] = await Promise.all([
-      call([{ role: 'system', content: replySystem }, ...history], 220),
-      call([{ role: 'system', content: extractSystem }, { role: 'user', content: answer }], 220).catch(() => '')
-    ]);
-    const reply = replyText.replace(/^["'`]+|["'`]+$/g, '').slice(0, 500);
-    if (!reply) return send(res, 502, { error: 'no reply' });
+    // 1) Understand this answer first, so the reply never asks for something just answered.
+    const extractText = await call([{ role: 'system', content: extractSystem }, { role: 'user', content: answer }], 220).catch(() => '');
     let ex = {};
     try { const m = extractText.match(/\{[\s\S]*\}/); ex = m ? JSON.parse(m[0]) : {}; } catch (e) { ex = {}; }
     const norm = x => String(x || '').toLowerCase().replace(/[\s.,!?'"]+/g, '');
@@ -90,14 +87,35 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
       } else if (k === 'interests') raw[k] = v;
     }
     const updates = clean(raw);
-    const nowMissing = missing.filter(k => updates[k] === undefined);
+    const newSkills = (Array.isArray(ex.skills) ? ex.skills : []).map(s => String(s).slice(0, 40)).filter(Boolean).slice(0, 5);
+    const allSkills = [...new Set([...skills, ...newSkills])];
+    const nowKnown = Object.keys(FIELDS).filter(k => known.includes(k) || updates[k] !== undefined);
+    const toAsk = Object.keys(FIELDS).filter(k => !nowKnown.includes(k) && !asked.includes(k));
     const userTurns = history.filter(m => m.role === 'user').length;
+
+    // 2) Decide the stage in code, not in the model: discover skills, then facts one by one, then finish.
+    const factsStarted = asked.length > 0 || known.length > 0;
+    let stage, next = null;
+    if (!factsStarted && userTurns < 3) stage = 'discover';
+    else if (toAsk.length) { stage = 'fact'; next = toAsk[0]; }
+    else stage = 'finish';
+
+    const base = `You are Raahi, a warm career guide for rural Indian students. Reply ONLY in ${lang}, plain text, max 2 short sentences, simple words a 15-year-old understands (it is read aloud). Never promise jobs, money or scholarships. Never invent facts. Never say "you already told me".`;
+    const task = stage === 'discover'
+      ? `Acknowledge exactly what they said, then ask ONE follow-up question about their skills or interests (how they learned it, who they do it for, have they taught it or earned from it). If they say "I don't know", ask about a normal day or what people ask their help with. Skills noticed so far: ${allSkills.join(', ') || 'none'}.`
+      : stage === 'fact'
+        ? `Briefly thank them for the answer (one short phrase). Then ask ONLY this, nothing else: ${ASK[next]}. Do NOT ask about hobbies, interests, sports or skills again.`
+        : `Thank them warmly in one sentence and tell them their career routes are ready to see. Do NOT ask any question.`;
+    const replyText = await call([{ role: 'system', content: base + '\n' + task }, ...history], 200);
+    const reply = replyText.replace(/^["'`]+|["'`]+$/g, '').slice(0, 500);
+    if (!reply) return send(res, 502, { error: 'no reply' });
     return send(res, 200, {
       reply,
       updates,
-      skills: (Array.isArray(ex.skills) ? ex.skills : []).map(s => String(s).slice(0, 40)).filter(Boolean).slice(0, 5),
+      skills: newSkills,
       suggestions: [],
-      done: nowMissing.length === 0 && userTurns >= 3
+      asking: next,
+      done: stage === 'finish'
     });
   } catch (e) {
     return send(res, 502, { error: 'sarvam unreachable', detail: String(e.message || e).slice(0, 200) });
