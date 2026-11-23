@@ -28,6 +28,10 @@ A 17-year-old in Villupuram stitches clothes for her neighbours. She has never t
 
 Career guidance in India is mostly in English, mostly for city students, and mostly a form that asks *"What do you want to become?"*. Raasta asks *"What do you already do?"* instead.
 
+<div align="center">
+<img src="aira/screenshots/concepts-en.png" width="720" alt="Raasta interface directions: conversation and Opportunity Radar">
+</div>
+
 ## What it does
 
 | | |
