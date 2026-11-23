@@ -324,7 +324,7 @@ html[lang="ta"] body{font-family:'Mukta Malar',Inter,sans-serif}
   grid-column:1;
   grid-row:1;
   /* 3D parallax container */
-  transform-style:preserve-3d;
+  transform-style:flat;
   transition:transform 0.1s linear;
 }
 
@@ -1756,12 +1756,7 @@ main#viewContainer::-webkit-scrollbar-thumb{background:rgba(10,51,39,0.18);borde
       ctx.stroke();
     });
 
-    /* Smooth parallax lerp for phone stage */
-    if(phoneStage && window.innerWidth >= 1100){
-      curRX += (targetRX - curRX) * 0.06;
-      curRY += (targetRY - curRY) * 0.06;
-      phoneStage.style.transform = `perspective(1200px) rotateY(${curRY}deg) rotateX(${curRX}deg)`;
-    }
+    /* phone stays flat: a 3D-tilted container breaks wheel scrolling inside the phone */
   }
 
   window.addEventListener('resize', resize);

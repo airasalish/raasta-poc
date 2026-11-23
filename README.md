@@ -41,8 +41,16 @@ Career guidance in India is mostly in English, mostly for city students, and mos
 | 🧭 **Your Routes** | Career routes built from the student's own skills, by AI when online and from a 17-career catalogue on the device when offline. Each route has photos and videos of real people doing the job. |
 | 📡 **Opportunity Radar** | Scholarship and training eligibility, checked rule by rule on the device: ✓ met, — not met, ? missing. A "maybe" tells you *exactly* which answer is missing. Every scheme links to its official source and is clearly labelled as unverified demo data. |
 | 🗺️ **My Pathway** | A week-by-week plan with links to official course sites (SWAYAM, Skill India Digital, NIOS, Apprenticeship India and others). |
-| 👪 **Parent Mode** | A spoken explanation for the family in their language, with a pre-recorded Tamil note for the demo. |
+| 👪 **Parent Mode** | Its own tab, written for the family in their language: what the student is good at, one route with its first steps, support they may qualify for (with official links), papers to keep ready, and three things to do this week. Every section can be read aloud, there is a voice note (pre-recorded in Tamil for the demo), and the summary can be shared on WhatsApp. |
 | 🏫 **School view** | A teacher sees every student who used the shared school phone, by name: skills, top route, possible schemes, who needs a closer look, and who hasn't started. |
+
+## Two versions, one app
+
+The live app opens in **Field Atlas**, the current design. **Classic** is the earlier interface from the same day, kept as a fallback. It runs inside the same phone frame and uses the same AI and voice.
+
+- **Desktop:** use the **App: Field Atlas | Classic** switch in the left panel.
+- **Phone:** tap **⇄ Classic version** on the first screen, and **⇄ Field Atlas** to come back.
+- **Direct link:** [raasta-poc.vercel.app/?classic](https://raasta-poc.vercel.app/?classic)
 
 ## Built on honesty
 
@@ -67,7 +75,7 @@ flowchart LR
 
 | Layer | What it is |
 |---|---|
-| **App** | Installable PWA in plain JavaScript, no build step. Network-first service worker, so it works offline after the first visit. |
+| **App** | Installable PWA in plain JavaScript, no build step. Network-first service worker, so it works offline after the first visit. The Classic version lives in `aira/app/classic/`. |
 | **Rules engine** | `engine.js` runs on the device. Every eligibility rule is JSON (`field`, `op`, `value`, `text`) with an official source link. |
 | **AI** | Sarvam AI (`sarvam-105b-conversations`) via Vercel serverless functions. The API key stays on the server, with an origin allow-list and a per-IP rate limit. |
 | **Voice** | Sarvam `saaras:v4` speech-to-text and `bulbul:v3` text-to-speech. Daily per-device budget, Stop button, falls back to the browser's own voice. |
@@ -76,9 +84,9 @@ flowchart LR
 ## Try it in 60 seconds
 
 1. Open **[raasta-poc.vercel.app](https://raasta-poc.vercel.app)** and pick **தமிழ்**.
-2. Tap **Presenter demo: Kavya** for the full story, or **New student** to talk to it yourself.
+2. On a laptop, use the demo deck in the left panel: **Kavya** (stitching) or **Murugan** (phone repair) jump straight to results, **Talk live** starts a real voice conversation, and **Reset** clears everything. On a phone, tap **Presenter demo: Kavya** or **New student**.
 3. Say something no form would expect, like *"I train pigeons"* or *"I fix fans for my neighbours"*, and watch the Skill Genome grow.
-4. Open **Radar** to see each rule checked, then **Path** for the plan and the parent voice note.
+4. Open **Radar** to see each rule checked, **Path** for the plan, then **Parent** for the family summary and voice note.
 5. **Teacher login** on the same phone shows the class.
 
 ## Run locally
