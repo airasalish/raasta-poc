@@ -119,7 +119,7 @@ const OPPORTUNITIES = [
     source_url: "https://www.myscheme.gov.in/schemes/pudhumai-penn-scheme", verified_by: null },
   { id: "central_sector", name: "Central Sector Scheme of Scholarship", type: "scholarship", benefit: "Annual scholarship for college",
     rules: [{ f: "education", op: "in", v: ["c11_12", "passed12"], t: "Class 12 student / passed" },
-            { f: "marks_percent", op: "gte", v: 80, t: "Above 80th percentile in Class 12 board (approx.)" },
+            { f: "marks_percent", op: "gte", v: 80, t: "About 80% or more in Class 12 (approx.: the scheme uses the top 20 percentile of your board, so check your board's cut-off)" },
             { f: "family_income_lakh", op: "lte", v: 4.5, t: "Family income up to ₹4.5 lakh" }],
     source_url: "https://scholarships.gov.in", verified_by: null },
   { id: "post_matric_obc", name: "Post-Matric Scholarship (BC/OBC)", type: "scholarship", benefit: "Fees + maintenance allowance",
@@ -200,3 +200,79 @@ const LANG_ADDITIONS={
 QUESTIONS.forEach((q,i)=>{q.hi=LANG_ADDITIONS.questions[i].hi;q.ml=LANG_ADDITIONS.questions[i].ml;q.options.forEach((o,j)=>{o.hi=LANG_ADDITIONS.options[i][0][j];o.ml=LANG_ADDITIONS.options[i][1][j]})});
 CAREERS.forEach(c=>{const x=LANG_ADDITIONS.careers[c.id];if(!x)return;Object.assign(c.title,x.title);c.why_i18n={hi:x.why.hi,ml:x.why.ml}});
 OPPORTUNITIES.forEach(o=>{const x=LANG_ADDITIONS.opportunity[o.id];if(!x)return;o.name_i18n=x.name;o.benefit_i18n=x.benefit;o.rules.forEach(r=>{r.hi=({gender:['लड़कियों के लिए','പെൺകുട്ടികൾക്കായി'],state:['तमिलनाडु में पढ़ाई','തമിഴ്നാട്ടിൽ പഠനം'],govt_school:['सरकारी स्कूल में पढ़ाई','സർക്കാർ സ്കൂളിൽ പഠനം'],education:['उच्च शिक्षा में प्रवेश','ഉന്നതവിദ്യാഭ്യാസത്തിലേക്ക് പ്രവേശനം'],marks_percent:['अंक संबंधी शर्त','മാർക്കുമായി ബന്ധപ്പെട്ട നിബന്ധന'],family_income_lakh:['परिवार की आय संबंधी शर्त','കുടുംബവരുമാന നിബന്ധന'],category:['BC / OBC श्रेणी','BC / OBC വിഭാഗം'],age:['न्यूनतम आयु शर्त','കുറഞ്ഞ പ്രായ നിബന്ധന']})[r.f]?.[0]||r.t;r.ml=({gender:['लड़कियों के लिए','പെൺകുട്ടികൾക്കായി'],state:['तमिलनाडु में पढ़ाई','തമിഴ്നാട്ടിൽ പഠനം'],govt_school:['सरकारी स्कूल में पढ़ाई','സർക്കാർ സ്കൂളിൽ പഠനം'],education:['उच्च शिक्षा में प्रवेश','ഉന്നतവിദ്യാഭ്യാസത്തിലേക്ക് പ്രവേശനം'],marks_percent:['अंक संबंधी शर्त','മാർക്കുമായി ബന്ധപ്പെട്ട നിബന്ധന'],family_income_lakh:['परिवार की आय संबंधी शर्त','കുടുംബവരുമാന നിബന്ധന'],category:['BC / OBC श्रेणी','BC / OBC വിഭാഗം'],age:['न्यूनतम आयु शर्त','കുറഞ്ഞ പ്രായ നിബന്ധന']})[r.f]?.[1]||r.t})});
+
+// ---- Added 23 Nov: skill families the catalogue was missing, and Tamil for reasons, schemes and rules ----
+// New careers list only official sites; no salary figures (earn left empty on purpose).
+CAREERS.push(
+  { id: "electrician", type: "vocational", tags: ["electrical"], min_edu: ["c9_10", "c11_12", "passed12", "dropout", "iti_diploma"],
+    title: { en: "Electrician (ITI trade)", ta: "எலக்ட்ரீஷியன் (ஐடிஐ தொழிற்பிரிவு)", hi: "इलेक्ट्रीशियन (ITI ट्रेड)", ml: "ഇലക്ട്രീഷ്യൻ (ഐടിഐ ട്രേഡ്)" },
+    why: "Fixing fans, lights or wiring is real electrical skill; an ITI trade certificate makes it recognised.",
+    why_i18n: { ta: "மின்விசிறி, விளக்கு, வயரிங் சரிசெய்வது உண்மையான மின் திறன்; ஐடிஐ சான்றிதழ் அதை அங்கீகரிக்கப்பட்டதாக்கும்.", hi: "पंखे, बत्ती या वायरिंग ठीक करना असली बिजली का हुनर है; ITI प्रमाणपत्र इसे मान्यता देता है।", ml: "ഫാൻ, ലൈറ്റ്, വയറിങ് നന്നാക്കുന്നത് യഥാർത്ഥ ഇലക്ട്രിക്കൽ കഴിവാണ്; ഐടിഐ സർട്ടിഫിക്കറ്റ് അതിന് അംഗീകാരം നൽകും." },
+    earn: "", path: [["Apply for the ITI Electrician trade", "TN Skill Training", "https://skilltraining.tn.gov.in"], ["Apprenticeship with a stipend", "Apprenticeship India", "https://www.apprenticeshipindia.gov.in"]], exams: ["ITI admission"] },
+  { id: "appliance_tech", type: "vocational", tags: ["electrical", "phone_repair"], min_edu: ["c9_10", "c11_12", "passed12", "dropout", "iti_diploma"],
+    title: { en: "Home Appliance Repair Technician", ta: "வீட்டு உபகரணப் பழுதுநீக்கும் டெக்னீஷியன்", hi: "घरेलू उपकरण मरम्मत तकनीशियन", ml: "ഗൃഹോപകരണ റിപ്പയർ ടെക്നീഷ്യൻ" },
+    why: "Repairing mixies, fans or motors at home is a trade people pay for; a short certified course builds on it.",
+    why_i18n: { ta: "மிக்ஸி, மின்விசிறி, மோட்டார் சரிசெய்வது மக்கள் பணம் தரும் தொழில்; குறுகிய சான்றிதழ் படிப்பு அதை வளர்க்கும்.", hi: "मिक्सी, पंखे या मोटर ठीक करना ऐसा काम है जिसके लिए लोग पैसे देते हैं; छोटा प्रमाणित कोर्स इसे आगे बढ़ाता है।", ml: "മിക്സി, ഫാൻ, മോട്ടോർ നന്നാക്കുന്നത് ആളുകൾ പണം നൽകുന്ന ജോലിയാണ്; ചെറിയ സർട്ടിഫൈഡ് കോഴ്സ് അത് വളർത്തും." },
+    earn: "", path: [["Find a home-appliance technician course", "Skill India Digital", "https://www.skillindiadigital.gov.in"]], exams: ["None"] },
+  { id: "performing_arts", type: "professional", tags: ["performing_arts"], min_edu: ["c9_10", "c11_12", "passed12", "ug", "dropout"],
+    title: { en: "Music / Dance (certificate, diploma or degree)", ta: "இசை / நடனம் (சான்றிதழ், டிப்ளமோ அல்லது பட்டம்)", hi: "संगीत / नृत्य (सर्टिफिकेट, डिप्लोमा या डिग्री)", ml: "സംഗീതം / നൃത്തം (സർട്ടിഫിക്കറ്റ്, ഡിപ്ലോമ അല്ലെങ്കിൽ ബിരുദം)" },
+    why: "Singing or dancing at festivals is a real skill; formal training opens teaching and performing routes.",
+    why_i18n: { ta: "திருவிழாக்களில் பாடுவதும் ஆடுவதும் உண்மையான திறன்; முறையான பயிற்சி கற்பித்தல், மேடை வழிகளைத் திறக்கும்.", hi: "त्योहारों में गाना या नाचना असली हुनर है; औपचारिक प्रशिक्षण से सिखाने और प्रस्तुति के रास्ते खुलते हैं।", ml: "ഉത്സവങ്ങളിൽ പാടുന്നതും ആടുന്നതും യഥാർത്ഥ കഴിവാണ്; ഔപചാരിക പരിശീലനം അധ്യാപന, അവതരണ വഴികൾ തുറക്കും." },
+    earn: "", path: [["Find a free music or dance course", "SWAYAM", "https://www.google.com/search?q=music+dance+course+site%3Aswayam.gov.in"], ["Look for a certificate in performing arts", "IGNOU", "https://www.google.com/search?q=performing+arts+certificate+site%3Aignou.ac.in"]], exams: [] },
+  { id: "sports_coach", type: "professional", tags: ["sports"], min_edu: ["c11_12", "passed12", "ug"],
+    title: { en: "Sports Coach / Physical Education Teacher", ta: "விளையாட்டுப் பயிற்சியாளர் / உடற்கல்வி ஆசிரியர்", hi: "खेल कोच / शारीरिक शिक्षा शिक्षक", ml: "സ്പോർട്സ് കോച്ച് / കായികാധ്യാപകൻ" },
+    why: "Playing for your school or village builds the base; coaching and PE courses turn it into a career.",
+    why_i18n: { ta: "பள்ளி அல்லது ஊருக்காக விளையாடுவது அடித்தளம்; பயிற்சியாளர், உடற்கல்விப் படிப்புகள் அதைத் தொழிலாக்கும்.", hi: "स्कूल या गाँव के लिए खेलना नींव है; कोचिंग और शारीरिक शिक्षा के कोर्स इसे करियर बनाते हैं।", ml: "സ്കൂളിനോ ഗ്രാമത്തിനോ വേണ്ടി കളിക്കുന്നത് അടിത്തറയാണ്; കോച്ചിങ്, കായിക വിദ്യാഭ്യാസ കോഴ്സുകൾ അതിനെ തൊഴിലാക്കും." },
+    earn: "", path: [["Play in district and state competitions", "Khelo India", "https://kheloindia.gov.in"], ["Coaching and physical education courses", "Sports Authority of India", "https://sportsauthorityofindia.nic.in"]], exams: ["B.P.Ed admission"] }
+);
+QUESTIONS[0].options.push(
+  { v: "performing_arts", icon: "🎵", en: "Music / dance", ta: "இசை / நடனம்", hi: "संगीत / नृत्य", ml: "സംഗീതം / നൃത്തം", kw: ["sing", "song", "danc", "music", "பாட்டு", "பாடு", "நடனம்", "ஆட்ட", "गाना", "नाच", "नृत्य", "പാട്ട്", "നൃത്ത", "ഡാൻസ്"] },
+  { v: "sports", icon: "⚽", en: "Sports", ta: "விளையாட்டு", hi: "खेल", ml: "കായികം", kw: ["sport", "football", "cricket", "kabaddi", "volleyball", "விளையாட்டு", "கால்பந்து", "கபடி", "खेल", "फुटबॉल", "क्रिकेट", "കളി", "ഫുട്ബോൾ"] },
+  { v: "electrical", icon: "💡", en: "Fixing fans & wiring", ta: "மின்விசிறி, வயரிங் சரிசெய்தல்", hi: "पंखे और वायरिंग ठीक करना", ml: "ഫാൻ, വയറിങ് നന്നാക്കൽ", kw: ["electric", "wiring", "fan", "mixie", "motor", "மின்", "வயரிங்", "मिक्सी", "बिजली", "वायरिंग", "ഇലക്ട്രിക്", "വയറിങ്"] }
+);
+const TA_ADDITIONS = {
+  careers: {
+    fashion_tech: "தையல் உண்மையான ஆடை உருவாக்கும் திறன்; இந்த வழி அதிலிருந்து வளர்கிறது.",
+    garment_supervisor: "தமிழ்நாட்டில் பெரிய ஆடைத் தொழில் உள்ளது; தையலுடன் தலைமைப் பண்பும் சேர்ந்தால் மேற்பார்வையாளர் வழி.",
+    iti_sewing: "அருகிலுள்ள அரசு ஐடிஐயில் ஒரு ஆண்டு தையல் பயிற்சி; வேலை தருபவர்கள் அறியும் சான்றிதழ்.",
+    textile_design_digital: "வளர்ந்து வரும் துறை: இணைய விற்பனையாளர்களுக்கு அச்சு வடிவங்கள் தேவை; துணி பற்றிய புரிதலும் இலவச வடிவமைப்புக் கருவிகளும் தொடக்கம்.",
+    mobile_tech: "ஒவ்வொரு ஊரிலும் போன் பழுதுநீக்கத்திற்குத் தேவை உள்ளது.",
+    agri_drone: "வளர்ந்து வரும் துறை: மருந்து தெளிக்கும் ட்ரோன்களுக்குப் பயிற்சி பெற்ற உள்ளூர் இயக்குநர்கள் தேவை.",
+    food_processing: "சமையல் திறன் பொதி உணவுத் தொழிலுக்கு வழிவகுக்கும்; கிராமங்களில் வளரும் தொழில்.",
+    teacher: "உங்கள் சொந்த ஊருக்குச் சேவை செய்யும் நிலையான அரசு வழி."
+  },
+  opp: {
+    pudhumai_penn: ["புதுமைப் பெண் (தமிழ்நாடு)", "உயர்கல்வியின் போது மாத உதவி (டெமோ விவரம்; சரிபார்க்கவும்)"],
+    central_sector: ["மத்தியத் துறை உதவித்தொகைத் திட்டம்", "கல்லூரிக்கான ஆண்டு உதவித்தொகை (டெமோ விவரம்; சரிபார்க்கவும்)"],
+    post_matric_obc: ["மெட்ரிக்கிற்குப் பிந்தைய உதவித்தொகை (BC/OBC)", "கட்டணம் + பராமரிப்புத் தொகை (டெமோ விவரம்; சரிபார்க்கவும்)"],
+    post_matric_sc: ["மெட்ரிக்கிற்குப் பிந்தைய உதவித்தொகை (SC)", "கட்டணம் + பராமரிப்புத் தொகை (டெமோ விவரம்; சரிபார்க்கவும்)"],
+    nmms: ["NMMS (வருவாய் மற்றும் தகுதி உதவித்தொகை)", "9-12ஆம் வகுப்புக்கான ஆண்டு உதவித்தொகை (டெமோ விவரம்; சரிபார்க்கவும்)"],
+    naps: ["NAPS தொழிற்பழகுநர் பயிற்சி", "வேலையில் கற்கும் போது மாத உதவித்தொகை"],
+    pmkvy: ["PMKVY குறுகிய காலப் பயிற்சி", "இலவசத் திறன் பயிற்சி + சான்றிதழ்"]
+  },
+  rules: {
+    "For girl students": "மாணவிகளுக்கு மட்டும்",
+    "Studied in Tamil Nadu": "தமிழ்நாட்டில் படித்திருக்க வேண்டும்",
+    "Studied Class 6-12 in a government school": "6-12ஆம் வகுப்பு அரசுப் பள்ளியில் படித்திருக்க வேண்டும்",
+    "Joining higher education after Class 12": "12ஆம் வகுப்புக்குப் பிறகு உயர்கல்வியில் சேர்தல்",
+    "Class 12 student / passed": "12ஆம் வகுப்பு படிப்பவர் / தேர்ச்சி பெற்றவர்",
+    "About 80% or more in Class 12 (approx.: the scheme uses the top 20 percentile of your board, so check your board's cut-off)": "12ஆம் வகுப்பில் சுமார் 80% அல்லது அதற்கு மேல் (தோராயம்: திட்டம் உங்கள் வாரியத்தின் முதல் 20 சதமானத்தைப் பார்க்கிறது; வாரிய வரம்பைச் சரிபார்க்கவும்)",
+    "Family income up to ₹4.5 lakh": "குடும்ப வருமானம் ₹4.5 லட்சம் வரை",
+    "BC / OBC category": "BC / OBC பிரிவு",
+    "SC category": "SC பிரிவு",
+    "Studying after Class 10": "10ஆம் வகுப்புக்குப் பிறகு படிப்பவர்",
+    "Family income up to ₹2.5 lakh": "குடும்ப வருமானம் ₹2.5 லட்சம் வரை",
+    "Exam taken in Class 8, renewed from Class 9": "8ஆம் வகுப்பில் தேர்வு, 9ஆம் வகுப்பிலிருந்து புதுப்பித்தல்",
+    "Government / aided school": "அரசு / உதவிபெறும் பள்ளி",
+    "Family income up to ₹3.5 lakh": "குடும்ப வருமானம் ₹3.5 லட்சம் வரை",
+    "At least 14 years (18 for hazardous trades)": "குறைந்தது 14 வயது (அபாயகரமான தொழில்களுக்கு 18)",
+    "Meets trade's minimum education": "தொழிற்பிரிவின் குறைந்தபட்சக் கல்வித் தகுதி",
+    "Age 15 or above": "15 வயது அல்லது அதற்கு மேல்"
+  }
+};
+CAREERS.forEach(c => { const w = TA_ADDITIONS.careers[c.id]; if (w) { c.why_i18n = c.why_i18n || {}; c.why_i18n.ta = w; } });
+OPPORTUNITIES.forEach(o => {
+  const x = TA_ADDITIONS.opp[o.id];
+  if (x) { o.name_i18n = o.name_i18n || {}; o.name_i18n.ta = x[0]; o.benefit_i18n = o.benefit_i18n || {}; o.benefit_i18n.ta = x[1]; }
+  o.rules.forEach(r => { if (TA_ADDITIONS.rules[r.t]) r.ta = TA_ADDITIONS.rules[r.t]; });
+});

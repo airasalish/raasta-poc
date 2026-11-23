@@ -25,11 +25,15 @@ function eligibility(profile) {
 
 function matchCareers(profile) {
   const interests = profile.interests || [];
+  // Matching needs at least one skill/interest; without one we return [] and the UI asks or shows a balanced fallback.
+  if (!interests.length) return [];
+  const edu = profile.education;
   const scored = CAREERS.map(c => {
-    let s = c.tags.filter(t => interests.includes(t)).length * 10;
-    if (c.min_edu.includes(profile.education)) s += 3; else s -= 8;
-    return { ...c, score: s };
-  }).filter(c => c.score > 0).sort((a, b) => b.score - a.score);
+    const hits = c.tags.filter(t => interests.includes(t)).length;
+    let s = hits * 10;
+    if (edu !== undefined && edu !== null) s += c.min_edu.includes(edu) ? 3 : -8; // unknown education: no penalty
+    return { ...c, score: s, hits };
+  }).filter(c => c.hits > 0 && c.score > 0).sort((a, b) => b.score - a.score || b.hits - a.hits);
   // Always surface at least one vocational and one emerging option if available
   const pick = scored.slice(0, 4);
   for (const t of ["vocational", "emerging"]) {

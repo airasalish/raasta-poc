@@ -15,7 +15,7 @@ const FIELDS = {
   family_income_lakh: 'number in lakh rupees per year, e.g. 0.8, 2, 3.5, 6',
   marks_percent: 'number 0-100 (latest exam)'
 };
-const TAGS = ['stitching', 'drawing', 'computers', 'phone_repair', 'farming', 'cooking'];
+const TAGS = ['stitching', 'drawing', 'computers', 'phone_repair', 'farming', 'cooking', 'performing_arts', 'sports', 'electrical'];
 
 function clean(updates) {
   const out = {};
@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
   const extractSystem =
 `Extract facts from a student's answer. The question was: "${lastQ ? lastQ.content : ''}". The answer may be in any Indian language or a speech transcript.
 Return ONLY a JSON object: {"updates":{"<field>":{"value":<value>,"quote":"<exact words from the answer that state it>"}},"skills":[...]}
-updates: include a field ONLY if the answer explicitly states it, or it is a direct short answer to the question (e.g. question about income, answer "4" -> family_income_lakh 4); never guess. Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if clearly related (e.g. sewing = stitching).
+updates: include a field ONLY if the answer explicitly states it, or it is a direct short answer to the question (e.g. question about income, answer "4" -> family_income_lakh 4); never guess. Fields: ${Object.entries(FIELDS).map(([k, v]) => k + ': ' + (Array.isArray(v) ? v.join('|') : v)).join('; ')}; interests: array from [${TAGS.join(',')}] only if the student says they DO or ENJOY it, with the quote (e.g. sewing = stitching, dance or singing = performing_arts, football or kabaddi = sports, fixing fans or wiring = electrical). Never for "I don't like ...". Same format: {"value":[...],"quote":"..."}.
 skills: abilities, interests or experiences shown in the answer, as short English labels (e.g. "Dance", "Teaching children", "Shop accounts"). [] if none.`;
 
   const call = (messages, max) => fetch('https://api.sarvam.ai/v1/chat/completions', {
@@ -83,8 +83,8 @@ skills: abilities, interests or experiences shown in the answer, as short Englis
     const raw = {};
     for (const [k, v] of Object.entries(ex.updates && typeof ex.updates === 'object' ? ex.updates : {})) {
       if (v && typeof v === 'object' && !Array.isArray(v) && 'value' in v) {
-        if (v.quote && norm(answer).includes(norm(v.quote))) raw[k] = v.value; // keep only facts backed by the student's own words
-      } else if (k === 'interests') raw[k] = v;
+        if (v.quote && norm(answer).includes(norm(v.quote))) raw[k] = v.value; // keep only facts backed by the student's own words (interests included)
+      }
     }
     const updates = clean(raw);
     const newSkills = (Array.isArray(ex.skills) ? ex.skills : []).map(s => String(s).slice(0, 40)).filter(Boolean).slice(0, 5);
