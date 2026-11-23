@@ -144,3 +144,7 @@ function ensureTalk(){if(S.chatMode)return;S.skills=S.skills||[];S.convo=S.convo
 // Demo deck: a real live voice conversation with a fresh student (replaces the old simulation).
 function startLiveDemo(){startChat();setTimeout(()=>voiceListen(),50)}
 window.startLiveDemo=startLiveDemo;
+// App version switch (desktop panel): the classic app runs inside the same phone frame, on the Field Atlas background.
+function setAppVersion(v){const on=v==='classic';const scr=document.querySelector('.device-screen')||document.getElementById('deviceMock');let f=document.getElementById('classicFrame');if(on&&!f&&scr){f=document.createElement('iframe');f.id='classicFrame';f.title='Raasta classic';f.src='classic/';f.allow='microphone; autoplay';scr.appendChild(f)}if(!on&&f)f.remove();document.body.classList.toggle('classic-on',on);document.querySelectorAll('[data-act="app-version"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===(on?'classic':'atlas'))));try{localStorage.setItem('raasta_app_version',on?'classic':'atlas')}catch{}}
+document.addEventListener('click',e=>{const x=e.target.closest('[data-act="app-version"]');if(x){setAppVersion(x.dataset.v);return}if(document.body.classList.contains('classic-on')&&e.target.closest('.editorial-panel [data-act],.peek-phone'))setAppVersion('atlas')},true);
+(()=>{let v=null;try{v=new URLSearchParams(location.search).has('classic')?'classic':localStorage.getItem('raasta_app_version')}catch{}if(v==='classic')setAppVersion('classic')})();
