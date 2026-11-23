@@ -68,16 +68,35 @@
   const ttsCache = new Map(); // same sentence is never paid for twice in one session
   let current = null;
 
+  let stopListening = null;
   function stopAll() {
     if (current) { try { current.pause(); } catch (e) {} current = null; }
     try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {}
+    try { if (window.__note && !window.__note.paused) window.__note.pause(); } catch (e) {}
+    if (stopListening) { try { stopListening(); } catch (e) {} stopListening = null; }
+    busy(false);
   }
+  // One floating Stop button, shown while Raasta is speaking or listening.
+  let stopBtn = null;
+  function busy(on) {
+    if (!stopBtn && on) {
+      stopBtn = document.createElement('button');
+      stopBtn.type = 'button'; stopBtn.className = 'voice-stop'; stopBtn.textContent = '■ Stop';
+      stopBtn.setAttribute('aria-label', 'Stop voice');
+      stopBtn.style.cssText = 'position:fixed;left:50%;bottom:88px;transform:translateX(-50%);z-index:9999;padding:10px 22px;border-radius:999px;border:0;background:#b3261e;color:#fff;font:600 15px Inter,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer';
+      stopBtn.addEventListener('click', e => { e.stopPropagation(); stopAll(); });
+      document.body.appendChild(stopBtn);
+    }
+    if (stopBtn) stopBtn.style.display = on ? 'block' : 'none';
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopAll(); });
 
   function playB64(b64) {
     return new Promise((resolve, reject) => {
       const a = player;
       current = a;
-      a.onended = () => { if (current === a) current = null; resolve(); };
+      a.onended = () => { if (current === a) current = null; busy(false); resolve(); };
+      a.onpause = () => { if (current !== a) resolve(); };
       a.onerror = () => { if (current === a) current = null; reject(new Error('play')); };
       a.src = 'data:audio/wav;base64,' + b64;
       a.play().catch(reject); // blocked or unsupported -> caller falls back to the browser voice
@@ -92,9 +111,11 @@
       const v = speechSynthesis.getVoices().find(x => x.lang === locale) ||
         speechSynthesis.getVoices().find(x => x.lang && x.lang.slice(0, 2) === locale.slice(0, 2));
       if (v) u.voice = v;
-      u.onend = u.onerror = () => resolve();
+      const done = () => { busy(false); resolve(); };
+      u.onend = u.onerror = done;
+      busy(true);
       speechSynthesis.speak(u);
-      setTimeout(resolve, Math.min(30000, 1500 + text.length * 120)); // never hang the UI
+      setTimeout(() => { try { speechSynthesis.cancel(); } catch (e) {} done(); }, Math.min(150000, 3000 + text.length * 110)); // hard stop
     });
   }
 
@@ -119,6 +140,7 @@
           ttsCache.set(key, b64);
           addUsage(Math.max(0.5, (b64.length * 0.75 - 44) / (22050 * 2))); // WAV, 22.05 kHz mono 16-bit
         }
+        busy(true);
         return await playB64(b64);
       } catch (e) { /* fall through to the browser voice */ }
     }
@@ -138,7 +160,9 @@
         cancelAnimationFrame(raf);
 
         if (rec.state !== 'inactive') rec.stop();
+        busy(false);
       };
+      stopListening = finish; busy(true);
       rec.ondataavailable = e => e.data && e.data.size && chunks.push(e.data);
       rec.onstop = () => {
         stream.getTracks().forEach(t => t.stop());
@@ -196,8 +220,11 @@
         resolve({ text: alts[0] || '', alts });
       };
       r.onerror = e => reject(new Error(e.error || 'error'));
-      r.onend = () => { if (!got) resolve({ text: '' }); };
+      r.onend = () => { busy(false); if (!got) resolve({ text: '' }); };
+      stopListening = () => { try { r.abort(); } catch (e) {} };
+      busy(true);
       r.start();
+      setTimeout(() => { try { r.stop(); } catch (e) {} }, 10000); // never listen for ever
     });
   }
 
