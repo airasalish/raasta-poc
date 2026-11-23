@@ -13,7 +13,7 @@ A student **talks in her own language**. Raasta works out what she is already go
 ![Languages](https://img.shields.io/badge/languages-Tamil%20%C2%B7%20English%20%C2%B7%20Hindi%20%C2%B7%20Malayalam-176f50)
 ![PWA](https://img.shields.io/badge/PWA-offline%20ready-123d2e)
 ![Voice](https://img.shields.io/badge/voice-Sarvam%20AI-bd8132)
-![Tests](https://img.shields.io/badge/tests-60%20passing-176f50)
+![Tests](https://img.shields.io/badge/tests-61%20passing-176f50)
 ![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%C2%B7%20Vercel-18251e)
 
 *Team Absolute Zero · SRM Institute of Science and Technology, Chennai · Citi India Hackathon (Ada Lovelace Day), Round 2*
@@ -41,7 +41,7 @@ Career guidance in India is mostly in English, mostly for city students, and mos
 | 🧭 **Your Routes** | Career routes built from the student's own skills, by AI when online and from a 17-career catalogue on the device when offline. Each route has photos and videos of real people doing the job. |
 | 📡 **Opportunity Radar** | Scholarship and training eligibility, checked rule by rule on the device: ✓ met, — not met, ? missing. A "maybe" tells you *exactly* which answer is missing. Every scheme links to its official source and is clearly labelled as unverified demo data. |
 | 🗺️ **My Pathway** | A week-by-week plan with links to official course sites (SWAYAM, Skill India Digital, NIOS, Apprenticeship India and others). |
-| 👪 **Parent Mode** | Its own tab, written for the family in their language: what the student is good at, one route with its first steps, support they may qualify for (with official links), papers to keep ready, and three things to do this week. Every section can be read aloud, there is a voice note built from the student's own data in about 60 seconds (Nandana's script builder; pre-recorded in Tamil for Kavya), and the summary can be shared on WhatsApp. |
+| 👪 **Parent Mode** | Its own tab, written for the family in their language: what the student is good at, one route with its first steps, support they may qualify for (with official links), papers to keep ready, and three things to do this week. Every section can be read aloud, there is a voice note built from the student's own data in about 60 seconds in English, Tamil, Hindi or Malayalam (Nandana's script builder; pre-recorded in Tamil for Kavya), and the summary can be shared on WhatsApp. |
 | 🏫 **School view** | A teacher sees every student who used the shared school phone, by name: skills, top route, possible schemes, who needs a closer look, and who hasn't started. |
 
 ## Two versions, one app
@@ -93,7 +93,7 @@ flowchart LR
 
 ```bash
 python -m http.server 5173 --directory aira/app      # static app (voice falls back to the browser)
-node aira/app/tests/run-all.js                         # 60 tests, no network, Sarvam is mocked
+node aira/app/tests/run-all.js                         # 61 tests, no network, Sarvam is mocked
 ```
 
 The AI and voice features need `SARVAM_API_KEY` set in the Vercel project environment. Keys are never committed.

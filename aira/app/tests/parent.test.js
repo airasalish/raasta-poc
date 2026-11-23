@@ -27,20 +27,28 @@ ok('Tamil note includes the first step in Tamil (from STEP_I18N)', () => {
 });
 ok('never speaks a salary, even if a career has one', () => {
   const c = Object.assign({}, career('fashion_tech'), { earn: '₹15,000-30,000/month (indicative)' });
-  for (const lang of ['en', 'ta']) { const t = parentNoteFor(KAVYA, c, lang, STEP_I18N).text; assert(!/₹|rupees|ரூபாய்|can earn|a month|சம்பாதிக்க/i.test(t), t); }
+  for (const lang of ['en', 'ta', 'hi', 'ml']) { const t = parentNoteFor(KAVYA, c, lang, STEP_I18N).text; assert(!/₹|rupees|ரூபாய்|can earn|a month|சம்பாதிக்க/i.test(t), t); }
 });
 ok('scholarships come from the rules engine (Murugan is SC: post-matric SC named)', () => {
   const t = parentNoteFor(MURUGAN, career('mobile_tech'), 'en', STEP_I18N).text;
   assert(/scholarship/i.test(t));
 });
 ok('stays within the ~60 second word budget', () => {
-  for (const lang of ['en', 'ta']) for (const p of [KAVYA, MURUGAN]) {
+  for (const lang of ['en', 'ta', 'hi', 'ml']) for (const p of [KAVYA, MURUGAN]) {
     const c = matchCareers(p)[0]; const r = parentNoteFor(p, c, lang, STEP_I18N);
     assert(r.words <= PARENT_MAX_WORDS[lang], lang + ' ' + r.words);
   }
 });
-ok('falls back (null) for Hindi/Malayalam, no name, or bad data', () => {
-  assert.strictEqual(parentNoteFor(MURUGAN, career('mobile_tech'), 'hi', STEP_I18N), null);
+ok('Hindi and Malayalam notes use local name, scheme names and first step', () => {
+  const c = career('mobile_tech'), first = c.path[0][0];
+  for (const [lang, name] of [['hi', 'मुरुगन'], ['ml', 'മുരുഗൻ']]) {
+    const t = parentNoteFor(MURUGAN, c, lang, STEP_I18N).text;
+    assert(t.includes(name) && !/Murugan/.test(t), t);
+    assert(t.includes(STEP_I18N[first][lang]) && !t.includes(first), t);
+    assert(!/NMMS \(Means/.test(t) && !/₹|rupees|रुपये|രൂപ/.test(t), t);
+  }
+});
+ok('falls back (null) for no name or bad data', () => {
   assert.strictEqual(parentNoteFor({ ...MURUGAN, name: '' }, career('mobile_tech'), 'en', STEP_I18N), null);
   assert.strictEqual(parentNoteFor(MURUGAN, null, 'en', STEP_I18N), null);
 });

@@ -162,15 +162,55 @@ async function playParentScript(text, lang, onState) {
 
 // ---------- Raasta app adapter ----------
 // Builds the spoken parent note for the app with Nandana's builder.
+// - Hindi and Malayalam templates are added here (her code is unchanged above); scheme names and the
+//   first step are swapped for the app's own Hindi/Malayalam translations (OPPORTUNITIES.name_i18n, STEP_I18N).
 // - Tamil first step comes from STEP_I18N (the app's step translations).
 // - `earn` is blanked: the app shows no salary figures, so the earnings line is always skipped.
-// Returns null when the builder can't be used (other languages, no name, bad career data); the app then uses its own note.
+// Returns null when the builder can't be used (no name, bad career data); the app then uses its own note.
+if (!PARENT_T.hi) PARENT_T.hi = {
+  intro: "नमस्ते! आपके बच्चे {name} के लिए {career} एक अच्छा रास्ता हो सकता है। एक मिनट में पूरी योजना सुनिए।",
+  duration: "पढ़ाई {duration} की है।",
+  cost: "कुल खर्च लगभग {cost} है।",
+  step: "पहला कदम: {step}।",
+  schol: "आपका बच्चा इन छात्रवृत्तियों के लिए पात्र हो सकता है: {list}। कृपया आधिकारिक वेबसाइट पर पुष्टि करें।",
+  earn: "पढ़ाई के बाद महीने में लगभग {earning} कमाए जा सकते हैं। ये अनुमानित आँकड़े हैं।",
+  close: "और मदद के लिए अपने शिक्षक से मिलिए। धन्यवाद!",
+  and: " और "
+};
+if (!PARENT_T.ml) PARENT_T.ml = {
+  intro: "നമസ്കാരം! നിങ്ങളുടെ കുട്ടി {name} മുന്നേറാൻ {career} ഒരു നല്ല വഴിയാകാം. ഒരു മിനിറ്റിൽ പദ്ധതി കേൾക്കൂ.",
+  duration: "പഠന കാലം: {duration}.",
+  cost: "ആകെ ചെലവ് ഏകദേശം {cost}.",
+  step: "ആദ്യ ചുവട്: {step}.",
+  schol: "ഈ സ്കോളർഷിപ്പുകൾക്ക് നിങ്ങളുടെ കുട്ടിക്ക് അർഹതയുണ്ടാകാം: {list}. ഔദ്യോഗിക വെബ്സൈറ്റിൽ ഉറപ്പാക്കൂ.",
+  earn: "പഠനം കഴിഞ്ഞാൽ മാസം ഏകദേശം {earning} സമ്പാദിക്കാം. ഇവ ഏകദേശ കണക്കുകളാണ്.",
+  close: "കൂടുതൽ സഹായത്തിന് അധ്യാപകനെ കാണൂ. നന്ദി!",
+  and: ", "
+};
+if (PARENT_MAX_WORDS.hi === undefined) PARENT_MAX_WORDS.hi = 140; // ESTIMATE, like Nandana's: time a real playback
+if (PARENT_MAX_WORDS.ml === undefined) PARENT_MAX_WORDS.ml = 100; // Malayalam joins words, so fewer per minute
+const PARENT_NAMES_I18N = {
+  hi: { Kavya: "काव्या", Murugan: "मुरुगन", Divya: "दिव्या", Selvam: "सेल्वम", Anitha: "अनीता" },
+  ml: { Kavya: "കാവ്യ", Murugan: "മുരുഗൻ", Divya: "ദിവ്യ", Selvam: "സെൽവം", Anitha: "അനിത" }
+};
 function parentNoteFor(profile, career, lang, stepI18n) {
   if (typeof buildParentScript !== "function" || !PARENT_T[lang] || !career || !career.title) return null;
   if (!profile || !profile.name) return null;
   const title = typeof career.title === "string" ? { en: career.title, [lang]: career.title } : career.title;
   const path = Array.isArray(career.path) ? career.path : [];
   const first = path[0] && path[0][0];
+  const local = lang === "hi" || lang === "ml";
   const c = Object.assign({}, career, { title, path, earn: "", first_step_ta: career.first_step_ta || (stepI18n && first && stepI18n[first] && stepI18n[first].ta) || undefined });
-  try { const r = buildParentScript(profile, c, lang); return r && r.text ? r : null; } catch (e) { return null; }
+  const p = local ? Object.assign({}, profile, { name: (PARENT_NAMES_I18N[lang] || {})[profile.name] || profile.name }) : profile;
+  try {
+    const r = buildParentScript(p, c, lang);
+    if (!r || !r.text) return null;
+    if (local) {
+      const step = first && stepI18n && stepI18n[first] && stepI18n[first][lang];
+      if (step) r.text = r.text.split(first).join(step);
+      if (typeof OPPORTUNITIES !== "undefined") for (const o of OPPORTUNITIES) { const n = o.name_i18n && o.name_i18n[lang]; if (n) r.text = r.text.split(o.name).join(n); }
+      r.words = r.text.split(/\s+/).length;
+    }
+    return r;
+  } catch (e) { return null; }
 }
