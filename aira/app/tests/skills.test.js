@@ -4,7 +4,7 @@ const dir = path.join(__dirname, '..');
 const app = fs.readFileSync(path.join(dir, 'app.js'), 'utf8');
 const ctx = { console };
 vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(path.join(dir, 'data.js'), 'utf8') + ';this.D={CAREERS};', ctx);
+vm.runInContext(fs.readFileSync(path.join(dir, 'data.js'), 'utf8') + ';this.D={CAREERS,STEP_I18N};', ctx);
 vm.runInContext(fs.readFileSync(path.join(dir, 'engine.js'), 'utf8') + ';this.E={matchCareers};', ctx);
 vm.runInContext(app.slice(app.indexOf('const SKILL_TAGS'), app.indexOf('const TYPE_TXT')) + ';this.T={skillTags};', ctx);
 const { skillTags } = ctx.T, { matchCareers } = ctx.E, { CAREERS } = ctx.D;
@@ -26,4 +26,6 @@ for (const [skill, tag, career] of cases) {
 for (const s of ['Studying', 'Watching TV', 'Nothing']) { assert.strictEqual(skillTags([s]).length, 0, s); n++; console.log('ok', s, '-> no tag (no guessing)'); }
 CAREERS.forEach(c => { assert(c.title.ta && c.title.hi && c.title.ml, c.id + ' titles'); assert(c.path.every(p => !p[2] || /^https:\/\//.test(p[2])), c.id + ' links'); });
 n++; console.log('ok every career has 4-language titles and https links');
+CAREERS.forEach(c => c.path.forEach(p => ['ta', 'hi', 'ml'].forEach(l => assert(ctx.D.STEP_I18N[p[0]] && ctx.D.STEP_I18N[p[0]][l], c.id + ' step ' + l + ': ' + p[0]))));
+n++; console.log('ok every pathway step is translated to ta, hi, ml');
 console.log(n + ' tests passed');
