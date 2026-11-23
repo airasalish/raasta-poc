@@ -189,9 +189,10 @@ if (!PARENT_T.ml) PARENT_T.ml = {
 };
 if (PARENT_MAX_WORDS.hi === undefined) PARENT_MAX_WORDS.hi = 140; // ESTIMATE, like Nandana's: time a real playback
 if (PARENT_MAX_WORDS.ml === undefined) PARENT_MAX_WORDS.ml = 100; // Malayalam joins words, so fewer per minute
+if (PARENT_TA.names && !PARENT_TA.names.Meena) PARENT_TA.names.Meena = "மீனா"; // live demo student
 const PARENT_NAMES_I18N = {
-  hi: { Kavya: "काव्या", Murugan: "मुरुगन", Divya: "दिव्या", Selvam: "सेल्वम", Anitha: "अनीता" },
-  ml: { Kavya: "കാവ്യ", Murugan: "മുരുഗൻ", Divya: "ദിവ്യ", Selvam: "സെൽവം", Anitha: "അനിത" }
+  hi: { Meena: "मीना", Kavya: "काव्या", Murugan: "मुरुगन", Divya: "दिव्या", Selvam: "सेल्वम", Anitha: "अनीता" },
+  ml: { Meena: "മീന", Kavya: "കാവ്യ", Murugan: "മുരുഗൻ", Divya: "ദിവ്യ", Selvam: "സെൽവം", Anitha: "അനിത" }
 };
 function parentNoteFor(profile, career, lang, stepI18n) {
   if (typeof buildParentScript !== "function" || !PARENT_T[lang] || !career || !career.title) return null;

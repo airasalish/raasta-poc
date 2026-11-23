@@ -56,4 +56,8 @@ ok('AI route with a plain-string title still works', () => {
   const r = parentNoteFor(MURUGAN, { id: 'ai_x', title: 'Phone repair shop assistant', path: [], earn: '₹9,000-12,000/month' }, 'en', STEP_I18N);
   assert(r && r.text.includes('Phone repair shop assistant') && !/₹|rupees/.test(r.text));
 });
+ok('live demo student Meena is named in Tamil, Hindi and Malayalam', () => {
+  const c = career('textile_design_digital');
+  for (const [lang, name] of [['ta', 'மீனா'], ['hi', 'मीना'], ['ml', 'മീന']]) assert(parentNoteFor({ ...KAVYA, name: 'Meena' }, c, lang, STEP_I18N).text.includes(name), lang);
+});
 console.log(n + ' tests passed');

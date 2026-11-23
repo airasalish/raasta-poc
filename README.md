@@ -13,7 +13,7 @@ A student **talks in her own language**. Raasta works out what she is already go
 ![Languages](https://img.shields.io/badge/languages-Tamil%20%C2%B7%20English%20%C2%B7%20Hindi%20%C2%B7%20Malayalam-176f50)
 ![PWA](https://img.shields.io/badge/PWA-offline%20ready-123d2e)
 ![Voice](https://img.shields.io/badge/voice-Sarvam%20AI-bd8132)
-![Tests](https://img.shields.io/badge/tests-63%20passing-176f50)
+![Tests](https://img.shields.io/badge/tests-64%20passing-176f50)
 ![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%C2%B7%20Vercel-18251e)
 
 *Team Absolute Zero · SRM Institute of Science and Technology, Chennai · Citi India Hackathon (Ada Lovelace Day), Round 2*
@@ -93,7 +93,7 @@ flowchart LR
 
 ```bash
 python -m http.server 5173 --directory aira/app      # static app (voice falls back to the browser)
-node aira/app/tests/run-all.js                         # 63 tests, no network, Sarvam is mocked
+node aira/app/tests/run-all.js                         # 64 tests, no network, Sarvam is mocked
 ```
 
 The AI and voice features need `SARVAM_API_KEY` set in the Vercel project environment. Keys are never committed.
