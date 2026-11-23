@@ -53,7 +53,7 @@
     stageIndex.textContent = meta.index;
     loading.classList.remove('is-hidden');
     primeDemoStorage(key);
-    frame.src = `index.html?demo=kavya&stage=${Date.now()}#${key === 'talk' ? 'start' : meta.view}`;
+    frame.src = `app.html?demo=kavya&stage=${Date.now()}#${key === 'talk' ? 'start' : meta.view}`;
   };
 
   const updateDevice = (device) => {
