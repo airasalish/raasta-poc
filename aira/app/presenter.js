@@ -74,4 +74,15 @@
   });
   frame.addEventListener('error', () => loading.classList.add('is-hidden'));
   updateDevice('mobile');
+  const setMode = (mode) => {
+    document.body.classList.toggle('mode-sim', mode === 'sim');
+    document.querySelectorAll('.mode-choice').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
+    if (mode === 'sim') { loading.classList.add('is-hidden'); updateDevice('mobile'); }
+    else window.RaastaSim?.pause();
+  };
+  document.querySelectorAll('.mode-choice').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  if (new URLSearchParams(location.search).get('mode') === 'sim') setMode('sim');
+  try {
+    if (window.QRCode) new QRCode(document.getElementById('qrCode'), { text: 'https://raasta-poc.vercel.app/', width: 168, height: 168, colorDark: '#102d22', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  } catch {}
 })();
