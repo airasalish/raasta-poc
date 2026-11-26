@@ -10,7 +10,7 @@
     careers: { index: '02 / 05', label: 'Career Routes', view: 'careers' },
     radar: { index: '03 / 05', label: 'Opportunity Radar', view: 'radar' },
     pathway: { index: '04 / 05', label: 'My Pathway', view: 'pathway' },
-    parent: { index: '05 / 05', label: 'Parent Mode', view: 'pathway', parent: true }
+    parent: { index: '05 / 05', label: 'Parent Mode', view: 'parent' }
   };
   const deviceLabels = { mobile: 'Mobile view', tablet: 'Tablet view', desktop: 'Desktop view' };
   let activeStage = 'talk';
@@ -33,7 +33,7 @@
     stageIndex.textContent = meta.index;
     loading.classList.remove('is-hidden');
     primeDemoStorage();
-    frame.src = `index.html?demo=kavya#${meta.view}`;
+    frame.src = `https://raasta-poc.vercel.app/index.html?demo=kavya#${meta.view}`;
   };
 
   const updateDevice = (device) => {

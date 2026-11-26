@@ -14,7 +14,7 @@
 <body>
   <div class="atlas-bg" aria-hidden="true"><span class="contour contour-a"></span><span class="contour contour-b"></span><span class="route-line"></span><span class="route-node node-a"></span><span class="route-node node-b"></span></div>
   <header class="presenter-topbar">
-    <a class="presenter-brand" href="presenter.html" aria-label="Raasta live presentation home"><span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19C8 19 7 5 13 5s3 14 7 14"/><circle cx="4" cy="19" r="1.2"/><circle cx="13" cy="5" r="1.2"/></svg></span><span><strong>Raasta</strong><small>THE FIELD ATLAS · ராஸ்தா</small></span></a>
+    <a class="presenter-brand" href="./" aria-label="Raasta live presentation home"><span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19C8 19 7 5 13 5s3 14 7 14"/><circle cx="4" cy="19" r="1.2"/><circle cx="13" cy="5" r="1.2"/></svg></span><span><strong>Raasta</strong><small>THE FIELD ATLAS · ராஸ்தா</small></span></a>
     <div class="topbar-meta"><span class="live-status"><i></i>LIVE PRODUCT VIEW</span><span class="topbar-divider"></span><span>TEAM ABSOLUTE ZERO</span></div>
   </header>
   <main class="presentation-grid">
@@ -40,7 +40,7 @@
         <button type="button" class="toolbar-icon" id="fullscreenBtn" aria-label="Enter fullscreen" title="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg></button>
       </div>
       <div class="device-wrap" id="deviceWrap" data-device="mobile">
-        <div class="device-bezel"><div class="device-sensor" aria-hidden="true"><span></span></div><div class="device-screen"><iframe id="appFrame" title="Interactive Raasta application" src="index.html?demo=kavya#start" allow="microphone; autoplay" loading="eager"></iframe><div class="sim-screen" id="simScreen" aria-live="polite"></div><div class="frame-loading" id="frameLoading"><span class="loading-orbit"></span><span>Opening the live route…</span></div></div></div>
+        <div class="device-bezel"><div class="device-sensor" aria-hidden="true"><span></span></div><div class="device-screen"><iframe id="appFrame" title="Interactive Raasta application" src="https://raasta-poc.vercel.app/index.html?demo=kavya#start" allow="microphone; autoplay" loading="eager"></iframe><div class="sim-screen" id="simScreen" aria-live="polite"></div><div class="frame-loading" id="frameLoading"><span class="loading-orbit"></span><span>Opening the live route…</span></div></div></div>
       </div>
       <div class="stage-caption"><span><b id="frameModeLabel">Mobile view</b> · actual Raasta app</span><span class="caption-hint">Scroll inside the device</span></div>
     </section>
@@ -68,5 +68,6 @@
   <script src="parentMode.js"></script>
   <script src="presenter.js"></script>
   <script src="presenter-sim.js"></script>
+  <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
 </body>
 </html>
