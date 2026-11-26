@@ -41,6 +41,8 @@ On screen, each route's pathway shows "Real apprenticeships hiring now". This li
 
 Example for the demo route (textile): **Sewing Machine Operator at Techno Activewear, Perundurai, Erode, ₹6,800–₹12,300 a month**, and Computerized Pattern Stitching Machine Junior Technician in Tiruppur, ₹6,800–₹15,000.
 
+**Deadline on the Radar.** The Central Sector Scholarship (CSSS) card shows "Apply on NSP by 30 Nov 2026". This date comes from the NSP listing in the knowledge base (scheme 28). **87 of the 168 NSP schemes close on 30 Nov 2026, the day of the finale.** Missed deadlines are one way students lose money they were eligible for.
+
 **Scholarship Radar.** The Radar uses Pranshu's 11 hand-checked schemes (`pranshu/server/schemes.py`, checked 21 Nov 2026), not the 168 raw NSP entries. The hand-checked ones have verified amounts and eligibility rules; the raw NSP list does not (see section 3).
 
 ## 3. What we left out, and why
@@ -49,7 +51,7 @@ Example for the demo route (textile): **Sewing Machine Operator at Techno Active
 |---|---|---|
 | Semantic search (Chroma, 2.8 GB + PyTorch) | Far too big for a phone, and it can't run on Vercel functions (about 250 MB limit) | Server API (section 4) |
 | Openings outside Tamil Nadu and before 2026 | The demo student is in Tamil Nadu and the app has no state question yet. Old postings are likely filled. | Per-state slices served by the API |
-| The 168 raw NSP schemes | The raw data has names and dates but no structured eligibility or amounts. Our rules engine must never invent those, so we only use hand-checked schemes. | Each scheme is checked by hand, then added to the rules engine |
+| The 168 raw NSP schemes (only the CSSS deadline is used) | The raw data has names and dates but no structured eligibility or amounts. Our rules engine must never invent those, so we only use hand-checked schemes. | Each scheme is checked by hand, then added to the rules engine |
 | DIKSHA (925k items) | School content for Class 9–10 learning. The demo flow is about careers after Class 12. | "Learn" step: 2–3 DIKSHA resources per route, by grade and Tamil medium |
 | SWAYAM / NPTEL (3,790 courses) | Mostly degree-level and in English | "Learn" step for college students |
 | Skill India catalog (2,061) | Contains test entries (for example "test course 123") and needs cleaning before students see it | After cleaning |

@@ -19,7 +19,7 @@ function eligibility(profile) {
     const status = reasons.some(x => x.passed === false) ? "not_eligible"
                  : reasons.some(x => x.passed === null) ? "maybe" : "eligible";
     return { opportunity_id: o.id, name: o.name, type: o.type, benefit: o.benefit, status, reasons,
-             source_url: o.source_url, verified: !!o.verified_by, source: o.source, checked: o.last_checked };
+             source_url: o.source_url, verified: !!o.verified_by, source: o.source, checked: o.last_checked, deadline: o.deadline };
   }).sort((a, b) => ["eligible", "maybe", "not_eligible"].indexOf(a.status) - ["eligible", "maybe", "not_eligible"].indexOf(b.status));
 }
 

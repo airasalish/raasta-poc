@@ -321,7 +321,8 @@ const SOURCED = {
     source: "Tamil Nadu Higher Education Policy Note 2026-27", source_url: "https://pudhumaipenn.tn.gov.in" },
   central_sector: { name: "PM-USP Central Sector Scholarship (CSSS)",
     benefit: "₹12,000 a year for the first three years of a degree, ₹20,000 in later years",
-    source: "Ministry of Education CSSS FAQ and NSP 2026-27" },
+    source: "Ministry of Education CSSS FAQ and NSP 2026-27",
+    deadline: "30 Nov 2026" }, // NSP portal listing (scheme 28), from the team knowledge base, 23 Nov 2026
   post_matric_obc: { name: "PM-YASASVI Post-Matric Scholarship (OBC/EBC/DNT)",
     benefit: "Academic allowance and fee support, by course group", source: "NSP Post-Matric OBC guidelines" },
   post_matric_sc: { benefit: "Course fees plus a yearly allowance, by course group", source: "PIB, Ministry of Social Justice, Aug 2026" },

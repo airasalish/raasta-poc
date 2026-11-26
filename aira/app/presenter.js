@@ -77,6 +77,7 @@
   const setMode = (mode) => {
     document.body.classList.toggle('mode-sim', mode === 'sim');
     document.querySelectorAll('.mode-choice').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
+    const lbl = document.querySelector('.toolbar-label'); if (lbl) lbl.lastChild.textContent = mode === 'sim' ? 'OFFLINE REPLAY' : 'LIVE APP';
     if (mode === 'sim') { loading.classList.add('is-hidden'); updateDevice('mobile'); }
     else window.RaastaSim?.pause();
   };

@@ -25,7 +25,7 @@
     return `<div class="sim-card ${o.status}"><div class="sim-card-top"><b>${esc(o.name)}</b><span class="sim-status">${o.status === 'eligible' ? '✓ Eligible' : '? Maybe'}</span></div>
       <div class="sim-benefit">${esc(o.benefit)}</div>
       ${missing.length ? `<div class="sim-missing">Missing: ${esc(missing.join(', '))}</div>` : ''}
-      ${full.source ? `<div class="sim-src">Source: ${esc(full.source)} · checked ${esc(full.last_checked)}</div>` : ''}</div>`;
+      ${full.deadline ? `<div class="sim-missing">⏰ Apply on NSP by ${esc(full.deadline)}</div>` : ''}${full.source ? `<div class="sim-src">Source: ${esc(full.source)} · checked ${esc(full.last_checked)}</div>` : ''}</div>`;
   }).join('');
 
   const steps = [
